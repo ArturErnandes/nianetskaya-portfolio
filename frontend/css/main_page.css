@@ -1,0 +1,8 @@
+body {
+    background-color: white;
+}
+
+#avatar_img {
+    border-radius: 50%;
+    height: 200px;
+}
