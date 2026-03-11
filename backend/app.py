@@ -1,12 +1,18 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from database import get_works_list_db
-from logger import get_logger
 
-
-logger = get_logger(__name__)
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/get_works_list", tags=["Works"], summary="Получение списка работ указанной категории")
