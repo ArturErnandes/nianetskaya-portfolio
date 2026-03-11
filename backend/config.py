@@ -1,18 +1,28 @@
 import json
+from pathlib import Path
 
 from .classes import AppConfig, DbConfig
 
+CONFIG_FILE = Path(__file__).parent.parent / "data.json"
+
+
+def load_config(filename: str | Path):
+    with open(filename, "r") as f:
+        return json.load(f)
+
+
+config = load_config(CONFIG_FILE)
 
 AppConfig = AppConfig(
-    host="localhost",
-    port=8000,
+    host=config["app"]["host"],
+    port=int(config["app"]["port"]),
 )
 
 
 DbConfig = DbConfig(
-    admin="postgres",
-    password="2208",
-    host ="localhost",
-    port=5555,
-    db_name="nia-portfolio"
+    admin=config["database"]["admin"],
+    password=config["database"]["password"],
+    host=config["database"]["host"],
+    port=int(config["database"]["port"]),
+    db_name=config["database"]["db_name"],
 )
