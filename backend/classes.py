@@ -2,6 +2,12 @@ from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
+class AppConfig:
+    host: str
+    port: int
+
+
+@dataclass(frozen=True)
 class DbConfig:
     admin: str
     password: str
