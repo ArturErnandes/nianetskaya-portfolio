@@ -1,9 +1,22 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
 
-from database import get_works_list_db
+from .database import get_works_list_db
+from .config import AppConfig
+from .logger import get_logger
 
 
+logger = get_logger(__name__)
+
+
+def app_run():
+    try:
+        logger.info("Запуск FastAPI app")
+        uvicorn.run(app, host=AppConfig.host, port=AppConfig.port)
+
+    except Exception as e:
+        logger.error(f"Ошибка при запуске FastAPI app: {str(e)}")
 app = FastAPI()
 
 app.add_middleware(
