@@ -17,8 +17,16 @@ class DbConfig:
 
 
 @dataclass(frozen=True)
-class WorkSchema:
+class ClosedWorkSchema:
     id: int
     title: str
-    text: str
+    caption: str
+    img_name: str
+
+
+@dataclass(frozen=True)
+class OpenedWorkSchema:
+    section_name: str
+    title: str
+    description: str
     img_name: str
