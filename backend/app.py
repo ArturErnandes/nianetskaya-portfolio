@@ -29,7 +29,7 @@ app.add_middleware(
 )
 
 
-@app.get("/get_works_list", tags=["Works"], summary="Получение списка работ указанной категории")
+@app.get("/api/works", tags=["Works"], summary="Получение списка работ указанной категории")
 async def get_works_list(section_name: str):
     try:
         return await get_works_list_db(section_name)
@@ -37,7 +37,7 @@ async def get_works_list(section_name: str):
         raise HTTPException(status_code=500, detail="load_error")
 
 
-@app.get("/get_work", tags=["Works"], summary="Получение данных указанной работы")
+@app.get("/api/works/{work_id}", tags=["Works"], summary="Получение данных указанной работы")
 async def get_work(work_id: int):
     try:
         return await get_work_db(work_id)
