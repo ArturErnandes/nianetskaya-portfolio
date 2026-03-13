@@ -57,7 +57,7 @@ async function loadWorks() {
 
             title.textContent = work.title;
             caption.textContent = work.caption;
-            details.textContent = "Подробнее";
+            details.textContent = "подробнее";
 
             figcaption.append(title, caption);
             figure.append(image, figcaption);
