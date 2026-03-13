@@ -1,8 +1,134 @@
 body {
-    background-color: white;
+    display: grid;
+    grid-template-columns: 35% 1fr;
+    column-gap: 2.5%;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #ffffff;
+    font-family: Inter, sans-serif;
+}
+
+.top_imgs {
+    position: relative;
+    width: 100%;
+    height: 245px;
+}
+
+#background_img {
+    display: block;
+    width: 108%;
+    height: 288px;
+    object-fit: cover;
+    background-color: #918585;
 }
 
 #avatar_img {
+    position: absolute;
+    left: 45px;
+    bottom: -78px;
+    width: 170px;
+    height: 170px;
     border-radius: 50%;
-    height: 200px;
+    object-fit: cover;
+    background-color: #d9d9d9;
+}
+
+.topic_sections {
+    width: 108%;
+    align-self: start;
+}
+
+.topic_sections ul {
+    margin: -70px 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid #dddddd;
+}
+
+.topic_sections li {
+    border-bottom: 1px solid #dddddd;
+}
+
+.topic_sections a {
+    display: block;
+    padding: 8px 20px;
+    color: #1f1f1f;
+    font-size: 18px;
+    line-height: 1.15;
+    text-decoration: none;
+}
+
+.works {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: start;
+    padding: 4% 4%;
+    box-sizing: border-box;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.works-list {
+    display: grid;
+    grid-template-columns: repeat(2, 45%);
+    column-gap: 6%;
+    row-gap: 3%;
+    margin-top: 1%;
+    padding: 0;
+    list-style: none;
+    justify-content: center;
+}
+
+.works-list li {
+    min-width: 0;
+}
+
+.works-list a {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
+.works-list figure {
+    margin: 0;
+}
+
+.works-list img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1.62 / 1;
+    object-fit: cover;
+    background-color: #d9d9d9;
+}
+
+.works-list figcaption {
+    margin-top: 12px;
+    text-align: center;
+}
+
+.works-list h5,
+.works-list p {
+    margin: 0;
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 1.2;
+    color: #7f7f7f;
+}
+
+.works-list h5 {
+    color: #000000;
+    font-weight: 700;
+}
+
+.works-list span {
+    display: block;
+    width: fit-content;
+    margin: 12px auto 0;
+    padding: 8px 36px;
+    background-color: #5A5A5A;
+    color: #ffffff;
+    font-size: 14px;
+    line-height: 1.2;
 }
