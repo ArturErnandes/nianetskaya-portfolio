@@ -1,7 +1,151 @@
 body {
-    background-color: white;
+    margin: 0;
+    padding: 24px 32px 40px;
+    background-color: #ffffff;
+    color: #1f1f1f;
+    font-family: Inter, sans-serif;
+    box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: inherit;
+}
+
+.section-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    margin: 0 auto 40px;
+}
+
+.back-link {
+    position: absolute;
+    left: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    color: #5a5a5a;
+    font-size: 42px;
+    line-height: 1;
+    text-decoration: none;
 }
 
 h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 1.2;
     text-align: center;
+}
+
+.works {
+    max-width: 1320px;
+    margin: 0 auto;
+}
+
+.works-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: 28px;
+    row-gap: 36px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.works-list li {
+    min-width: 0;
+}
+
+.works-list a {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
+.works-list figure {
+    margin: 0;
+}
+
+.works-list img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1.62 / 1;
+    object-fit: cover;
+    background-color: #d9d9d9;
+}
+
+.works-list figcaption {
+    margin-top: 12px;
+    text-align: left;
+}
+
+.works-list h5,
+.works-list p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.2;
+    color: #7f7f7f;
+    font-weight: 400;
+}
+
+.works-list h5 {
+    color: #000000;
+    font-weight: 700;
+}
+
+.works-list span {
+    display: block;
+    width: fit-content;
+    margin: 18px auto 0;
+    padding: 8px 36px;
+    background-color: #5a5a5a;
+    color: #ffffff;
+    font-size: 14px;
+    line-height: 1.2;
+}
+
+@media (max-width: 980px) {
+    body {
+        padding: 24px 20px 32px;
+    }
+
+    .works-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    body {
+        padding: 20px 16px 28px;
+    }
+
+    .section-header {
+        justify-content: flex-start;
+        min-height: auto;
+        margin-bottom: 28px;
+        padding-left: 34px;
+    }
+
+    .back-link {
+        width: 24px;
+        height: 24px;
+        font-size: 34px;
+    }
+
+    h1 {
+        font-size: 20px;
+        text-align: left;
+    }
+
+    .works-list {
+        grid-template-columns: 1fr;
+        row-gap: 28px;
+    }
 }
