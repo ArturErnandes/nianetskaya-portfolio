@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://127.0.0.1:8000";
+const API_BASE_URL = "http://31.128.48.187:8080";
 const ASSETS_PATH = "../../assets";
 
 const API_ENDPOINTS = {
