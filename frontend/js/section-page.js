@@ -30,6 +30,30 @@ function revealImage(image, skeleton) {
     }
 }
 
+function revealStaticImage(image) {
+    if (!image) {
+        return;
+    }
+
+    const showImage = async () => {
+        try {
+            if (typeof image.decode === "function") {
+                await image.decode();
+            }
+        } catch (error) {
+            // Ignore decode failures and reveal the loaded image anyway.
+        }
+
+        image.classList.add("is-loaded");
+    };
+
+    image.addEventListener("load", showImage, { once: true });
+
+    if (image.complete && image.naturalWidth > 0) {
+        void showImage();
+    }
+}
+
 function createWorkItem(work, index) {
     const workItem = document.createElement("li");
     const workLink = document.createElement("a");
@@ -69,6 +93,11 @@ function createWorkItem(work, index) {
     return workItem;
 }
 
+function initMainPageImages() {
+    revealStaticImage(document.getElementById("background_img"));
+    revealStaticImage(document.getElementById("avatar_img"));
+}
+
 async function loadWorks() {
     const worksSection = document.querySelector(".works");
     const worksList = worksSection?.querySelector(".works-list");
@@ -102,4 +131,5 @@ async function loadWorks() {
     }
 }
 
+initMainPageImages();
 void loadWorks();
