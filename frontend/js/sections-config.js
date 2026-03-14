@@ -9,7 +9,7 @@ const SECTIONS_CONFIG = {
         heading: "графический дизайн",
     },
     portfolio_presentation_design: {
-        heading: "дизайн портфолио \ презентаций",
+        heading: "дизайн портфолио \\ презентаций",
     },
     art_objects: {
         heading: "арт объекты",
