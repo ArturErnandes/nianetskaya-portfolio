@@ -112,6 +112,77 @@ h1 {
     line-height: 1.2;
 }
 
+.work-item {
+    opacity: 0;
+    transform: translateY(18px);
+    animation: work-card-enter 420ms ease forwards;
+}
+
+.skeleton-card {
+    display: block;
+}
+
+.skeleton-card figure {
+    margin: 0;
+}
+
+.skeleton-block {
+    position: relative;
+    overflow: hidden;
+    background: #ececec;
+}
+
+.skeleton-block::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.75), transparent);
+    animation: skeleton-shimmer 1.2s ease-in-out infinite;
+}
+
+.skeleton-image {
+    width: 100%;
+    aspect-ratio: 1.62 / 1;
+}
+
+.skeleton-card figcaption {
+    margin-top: 12px;
+    text-align: center;
+}
+
+.skeleton-title {
+    width: 68%;
+    height: 16px;
+    margin: 0 auto;
+}
+
+.skeleton-text {
+    width: 86%;
+    height: 14px;
+    margin: 8px auto 0;
+}
+
+.skeleton-button {
+    width: 132px;
+    height: 36px;
+    margin: 18px auto 0;
+    background: #d8d8d8;
+}
+
+@keyframes skeleton-shimmer {
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes work-card-enter {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 @media (max-width: 980px) {
     body {
         padding: 24px 20px 32px;
