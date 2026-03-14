@@ -6,51 +6,27 @@
  * @property {string} img_name
  */
 
-function renderSkeletons(worksList, count) {
-    worksList.innerHTML = "";
+function revealImage(image, skeleton) {
+    const showImage = async () => {
+        try {
+            if (typeof image.decode === "function") {
+                await image.decode();
+            }
+        } catch (error) {
+            // Ignore decode failures and reveal the loaded image anyway.
+        }
 
-    for (let index = 0; index < count; index += 1) {
-        const skeletonItem = document.createElement("li");
-        const skeletonCard = document.createElement("div");
-        const skeletonFigure = document.createElement("figure");
-        const skeletonImage = document.createElement("div");
-        const skeletonCaption = document.createElement("figcaption");
-        const skeletonTitle = document.createElement("div");
-        const skeletonText = document.createElement("div");
-        const skeletonButton = document.createElement("div");
-
-        skeletonItem.className = "skeleton-item";
-        skeletonCard.className = "skeleton-card";
-        skeletonImage.className = "skeleton-block skeleton-image";
-        skeletonTitle.className = "skeleton-block skeleton-title";
-        skeletonText.className = "skeleton-block skeleton-text";
-        skeletonButton.className = "skeleton-block skeleton-button";
-
-        skeletonCaption.append(skeletonTitle, skeletonText);
-        skeletonFigure.append(skeletonImage, skeletonCaption);
-        skeletonCard.append(skeletonFigure, skeletonButton);
-        skeletonItem.append(skeletonCard);
-        worksList.append(skeletonItem);
-    }
-}
-
-function bindImageReveal(image, skeleton) {
-    if (!image || !skeleton) {
-        return;
-    }
-
-    const revealImage = () => {
         image.classList.add("is-loaded");
         skeleton.classList.add("is-hidden");
     };
 
-    image.addEventListener("load", revealImage);
+    image.addEventListener("load", showImage, { once: true });
     image.addEventListener("error", () => {
         skeleton.classList.add("is-hidden");
-    });
+    }, { once: true });
 
-    if (image.complete) {
-        revealImage();
+    if (image.complete && image.naturalWidth > 0) {
+        void showImage();
     }
 }
 
@@ -69,13 +45,16 @@ function createWorkItem(work, index) {
     workItem.className = "work-item";
     workItem.style.animationDelay = `${index * 80}ms`;
     workLink.href = `./work.html?work_id=${work.id}`;
+
     media.className = "work-media";
     image.className = "work-image";
     imageSkeleton.className = "work-image-skeleton skeleton-block";
 
     image.alt = work.title;
-    bindImageReveal(image, imageSkeleton);
+    image.loading = "lazy";
+    image.decoding = "async";
     image.src = `${WORKS_ASSETS_PATH}/${work.img_name}`;
+    revealImage(image, imageSkeleton);
 
     title.textContent = work.title;
     caption.textContent = work.caption;
@@ -92,23 +71,16 @@ function createWorkItem(work, index) {
 
 async function loadWorks() {
     const worksSection = document.querySelector(".works");
+    const worksList = worksSection?.querySelector(".works-list");
+    const sectionName = worksSection?.dataset.sectionName;
 
-    if (!worksSection) {
-        return;
-    }
-
-    const sectionName = worksSection.dataset.sectionName;
-    const worksList = worksSection.querySelector(".works-list");
-
-    if (!sectionName || !worksList) {
+    if (!worksList || !sectionName) {
         return;
     }
 
     const requestUrl = `${API_ENDPOINTS.works}?section_name=${encodeURIComponent(sectionName)}`;
 
     try {
-        renderSkeletons(worksList, 6);
-
         const response = await fetch(requestUrl);
 
         if (!response.ok) {
@@ -124,13 +96,8 @@ async function loadWorks() {
             return;
         }
 
-        worksList.innerHTML = "";
-
-        for (const [index, work] of works.entries()) {
-            worksList.append(createWorkItem(work, index));
-        }
+        worksList.replaceChildren(...works.map(createWorkItem));
     } catch (error) {
-        worksList.innerHTML = "";
         console.error("Ошибка при загрузке работ:", error);
     }
 }
