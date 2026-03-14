@@ -3,29 +3,24 @@
     <head>
         <meta charset="UTF-8">
         <title>Винецкая</title>
-        <link rel="stylesheet" href="../css/main-page.css">
+        <link rel="stylesheet" href="/frontend/css/main-page.css">
     </head>
-    <body>
+    <body data-page="main">
         <div class="top_imgs">
             <img id="background_img" src="/assets/background-img.jpg" alt="">
             <img id="avatar_img" src="/assets/avatar.png" alt="">
         </div>
         <nav class="topic_sections">
-            <ul>
-                <li><a href="./book-illustration.html">книжная иллюстрация</a></li>
-                <li><a href="">станковая графика</a></li>
-                <li><a href="">графический дизайн</a></li>
-                <li><a href="">дизайн портфолио \ презентаций</a></li>
-                <li><a href="">арт объекты</a></li>
-                <li><a href="">живопись</a></li>
-                <li><a href="">дизайн текстиля</a></li>
+            <ul data-sections-list>
             </ul>
         </nav>
-        <section class="works" data-section-name="main_page">
+        <section class="works">
             <ul class="works-list">
             </ul>
         </section>
-        <script src="../js/config.js"></script>
-        <script src="../js/section-page.js"></script>
+        <script src="/frontend/js/config.js"></script>
+        <script src="/frontend/js/sections-config.js"></script>
+        <script src="/frontend/js/works-shared.js"></script>
+        <script src="/frontend/js/main-page.js"></script>
     </body>
 </html>
