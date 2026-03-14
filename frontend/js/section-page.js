@@ -38,7 +38,9 @@ function createWorkItem(work, index) {
     const workItem = document.createElement("li");
     const workLink = document.createElement("a");
     const figure = document.createElement("figure");
+    const media = document.createElement("div");
     const image = document.createElement("img");
+    const imageSkeleton = document.createElement("div");
     const figcaption = document.createElement("figcaption");
     const title = document.createElement("h5");
     const caption = document.createElement("p");
@@ -47,18 +49,34 @@ function createWorkItem(work, index) {
     workItem.className = "work-item";
     workItem.style.animationDelay = `${index * 80}ms`;
     workLink.href = `./work.html?work_id=${work.id}`;
+    media.className = "work-media";
+    image.className = "work-image";
+    imageSkeleton.className = "work-image-skeleton skeleton-block";
 
-    image.src = `${WORKS_ASSETS_PATH}/${work.img_name}`;
     image.alt = work.title;
+    image.addEventListener("load", () => {
+        image.classList.add("is-loaded");
+        imageSkeleton.classList.add("is-hidden");
+    });
+    image.addEventListener("error", () => {
+        imageSkeleton.classList.add("is-hidden");
+    });
+    image.src = `${WORKS_ASSETS_PATH}/${work.img_name}`;
 
     title.textContent = work.title;
     caption.textContent = work.caption;
     details.textContent = "подробнее";
 
     figcaption.append(title, caption);
-    figure.append(image, figcaption);
+    media.append(image, imageSkeleton);
+    figure.append(media, figcaption);
     workLink.append(figure, details);
     workItem.append(workLink);
+
+    if (image.complete) {
+        image.classList.add("is-loaded");
+        imageSkeleton.classList.add("is-hidden");
+    }
 
     return workItem;
 }
