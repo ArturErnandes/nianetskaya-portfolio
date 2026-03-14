@@ -34,6 +34,26 @@ function renderSkeletons(worksList, count) {
     }
 }
 
+function bindImageReveal(image, skeleton) {
+    if (!image || !skeleton) {
+        return;
+    }
+
+    const revealImage = () => {
+        image.classList.add("is-loaded");
+        skeleton.classList.add("is-hidden");
+    };
+
+    image.addEventListener("load", revealImage);
+    image.addEventListener("error", () => {
+        skeleton.classList.add("is-hidden");
+    });
+
+    if (image.complete) {
+        revealImage();
+    }
+}
+
 function createWorkItem(work, index) {
     const workItem = document.createElement("li");
     const workLink = document.createElement("a");
@@ -54,13 +74,7 @@ function createWorkItem(work, index) {
     imageSkeleton.className = "work-image-skeleton skeleton-block";
 
     image.alt = work.title;
-    image.addEventListener("load", () => {
-        image.classList.add("is-loaded");
-        imageSkeleton.classList.add("is-hidden");
-    });
-    image.addEventListener("error", () => {
-        imageSkeleton.classList.add("is-hidden");
-    });
+    bindImageReveal(image, imageSkeleton);
     image.src = `${WORKS_ASSETS_PATH}/${work.img_name}`;
 
     title.textContent = work.title;
@@ -72,11 +86,6 @@ function createWorkItem(work, index) {
     figure.append(media, figcaption);
     workLink.append(figure, details);
     workItem.append(workLink);
-
-    if (image.complete) {
-        image.classList.add("is-loaded");
-        imageSkeleton.classList.add("is-hidden");
-    }
 
     return workItem;
 }
@@ -125,6 +134,5 @@ async function loadWorks() {
         console.error("Ошибка при загрузке работ:", error);
     }
 }
-
 
 void loadWorks();
