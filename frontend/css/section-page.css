@@ -1,9 +1,9 @@
 body {
     margin: 0;
-    padding: 24px 32px 40px;
+    padding: 50px 32px 40px;
     background-color: #ffffff;
     color: #1f1f1f;
-    font-family: Inter, sans-serif;
+    font-family: "Inter", sans-serif;
     box-sizing: border-box;
 }
 
@@ -38,7 +38,7 @@ body {
 
 h1 {
     margin: 0;
-    font-size: 24px;
+    font-size: 35px;
     font-weight: 400;
     line-height: 1.2;
     text-align: center;
@@ -51,12 +51,13 @@ h1 {
 
 .works-list {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    column-gap: 28px;
-    row-gap: 36px;
-    margin: 0;
+    grid-template-columns: repeat(3, 30%);
+    column-gap: 6%;
+    row-gap: 4%;
+    margin-top: 50px;
     padding: 0;
     list-style: none;
+    justify-content: center;
 }
 
 .works-list li {
