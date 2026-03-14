@@ -52,7 +52,7 @@ async function loadWorks() {
 
             workLink.href = `./work.html?work_id=${work.id}`;
 
-            image.src = `${ASSETS_PATH}/${work.img_name}`;
+            image.src = `${WORKS_ASSETS_PATH}/${work.img_name}`;
             image.alt = work.title;
 
             title.textContent = work.title;
