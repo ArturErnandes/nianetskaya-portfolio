@@ -1,23 +1,23 @@
 const SECTIONS_CONFIG = {
     book_illustration: {
-        heading: "Книжная иллюстрация",
+        heading: "книжная иллюстрация",
     },
     easel_graphics: {
-        heading: "Станковая графика",
+        heading: "станковая графика",
     },
     graphic_design: {
-        heading: "Графический дизайн",
+        heading: "графический дизайн",
     },
     portfolio_presentation_design: {
-        heading: "Дизайн портфолио / презентаций",
+        heading: "дизайн портфолио \ презентаций",
     },
     art_objects: {
-        heading: "Арт объекты",
+        heading: "арт объекты",
     },
     painting: {
-        heading: "Живопись",
+        heading: "живопись",
     },
     textile_design: {
-        heading: "Дизайн текстиля",
+        heading: "дизайн текстиля",
     },
 };
