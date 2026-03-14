@@ -34,14 +34,18 @@ body {
     height: 170px;
     border-radius: 50%;
     object-fit: cover;
-    background-color: #d9d9d9;
-    opacity: 0;
-    transition: opacity 280ms ease;
+    background-color: #ffffff;
+    transform: scale(0.96);
+    transition: transform 320ms ease;
 }
 
 #background_img.is-loaded,
 #avatar_img.is-loaded {
     opacity: 1;
+}
+
+#avatar_img.is-loaded {
+    transform: scale(1);
 }
 
 .topic_sections {
