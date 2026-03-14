@@ -16,7 +16,7 @@ new_session = async_sessionmaker(engine, expire_on_commit=False)
 
 
 async def get_works_list_db(section_name: str) -> list[ClosedWorkSchema]:
-    query = text("SELECT work_id, title, caption, img_name FROM works WHERE section_name = :section_name")
+    query = text("SELECT work_id, title, caption, img_name FROM works WHERE section_name = :section_name ORDER BY work_id")
 
     try:
         async with new_session() as session:
