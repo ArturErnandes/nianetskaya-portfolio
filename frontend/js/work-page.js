@@ -6,8 +6,14 @@
  * @property {string} img_name
  */
 
-function getWorkIdFromSearch() {
-    const workId = Number(new URLSearchParams(window.location.search).get("work_id"));
+function getWorkIdFromPath() {
+    const match = window.location.pathname.match(/^\/work\/(\d+)\/?$/);
+
+    if (!match) {
+        return null;
+    }
+
+    const workId = Number(match[1]);
 
     if (!Number.isInteger(workId) || workId <= 0) {
         return null;
@@ -70,7 +76,7 @@ async function initWorkPage() {
         return;
     }
 
-    const workId = getWorkIdFromSearch();
+    const workId = getWorkIdFromPath();
     const workCard = document.querySelector(".work-card");
     const worksList = document.querySelector(".works-list");
     const backLink = document.querySelector(".back-link");
