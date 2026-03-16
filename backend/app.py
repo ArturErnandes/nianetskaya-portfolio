@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
-from .database import get_works_list_db, get_work_db
+from .database import get_works_list_db, get_random_works_list_db, get_work_db
 from .config import AppConfig
 from .exceptions import WorkLoadError, WorkNotFoundError
 from .logger import get_logger
@@ -33,6 +33,14 @@ app.add_middleware(
 async def get_works_list(section_name: str):
     try:
         return await get_works_list_db(section_name)
+    except WorkLoadError:
+        raise HTTPException(status_code=500, detail="load_error")
+
+
+@app.get("/api/random_works")
+async def get_random_works():
+    try:
+        return await get_random_works_list_db()
     except WorkLoadError:
         raise HTTPException(status_code=500, detail="load_error")
 
