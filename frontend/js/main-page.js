@@ -1,5 +1,3 @@
-const MAIN_PAGE_SECTION_NAME = "main_page";
-
 function initMainPageImages() {
     revealStaticImage(document.getElementById("background_img"));
     revealStaticImage(document.getElementById("avatar_img"));
@@ -37,12 +35,8 @@ async function loadMainPageWorks() {
         return;
     }
 
-    worksSection.dataset.sectionName = MAIN_PAGE_SECTION_NAME;
-
-    const requestUrl = `${API_ENDPOINTS.works}?section_name=${encodeURIComponent(MAIN_PAGE_SECTION_NAME)}`;
-
     try {
-        const response = await fetch(requestUrl);
+        const response = await fetch(API_ENDPOINTS.randomWorks);
 
         if (!response.ok) {
             console.error(`Ошибка ответа API: ${response.status}`);
