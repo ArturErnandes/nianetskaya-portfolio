@@ -68,7 +68,7 @@ function createWorkItem(work, index) {
 
     workItem.className = "work-item";
     workItem.style.animationDelay = `${index * 80}ms`;
-    workLink.href = `/frontend/html/work-page.html?work_id=${work.id}`;
+    workLink.href = `/work/${work.id}`;
 
     media.className = "work-media";
     image.className = "work-image";
