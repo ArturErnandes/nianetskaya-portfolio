@@ -1,0 +1,138 @@
+.section-header {
+    max-width: 1320px;
+    margin-bottom: 18px;
+}
+
+.work-card {
+    max-width: 1320px;
+    margin: 0 auto;
+}
+
+.work-content {
+    margin: 0;
+}
+
+.work-card .work-media {
+    width: 80%;
+    margin: 0 auto;
+}
+
+.work-card .work-image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1.62 / 1;
+    object-fit: contain;
+    background-color: transparent;
+}
+
+.work-content figcaption {
+    margin-top: 20px;
+}
+
+.work-card h1 {
+    margin: 0;
+    font-size: 35px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: left;
+}
+
+.work-content p {
+    margin: 12px 0 0;
+    max-width: 920px;
+    font-size: 13px;
+    line-height: 1.4;
+    color: #1f1f1f;
+    white-space: pre-line;
+}
+
+.work-footer {
+    max-width: 1320px;
+    margin: 40px auto 0;
+}
+
+.work-footer > h5 {
+    margin: 0 0 18px;
+    font-size: 13px;
+    line-height: 1.2;
+    font-weight: 400;
+    color: #7f7f7f;
+    text-transform: lowercase;
+}
+
+.works {
+    max-width: 1320px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #b5b5b5 transparent;
+}
+
+.works::-webkit-scrollbar {
+    height: 8px;
+}
+
+.works::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.works::-webkit-scrollbar-track-piece {
+    margin: 0 12px;
+}
+
+.works::-webkit-scrollbar-thumb {
+    background: #b5b5b5;
+    border-radius: 999px;
+}
+
+.works-list {
+    display: flex;
+    gap: 28px;
+    margin-top: 0;
+    padding: 0 0 12px;
+    justify-content: flex-start;
+}
+
+.works-list li {
+    flex: 0 0 min(380px, calc(100vw - 96px));
+}
+
+@media (max-width: 980px) {
+    .work-card h1 {
+        font-size: 28px;
+    }
+
+    .work-card .work-media {
+        width: 100%;
+    }
+
+    .works-list li {
+        flex-basis: min(320px, calc(100vw - 64px));
+    }
+}
+
+@media (max-width: 640px) {
+    .section-header {
+        margin-bottom: 16px;
+    }
+
+    .work-card h1 {
+        font-size: 20px;
+    }
+
+    .work-content figcaption {
+        margin-top: 16px;
+    }
+
+    .work-footer {
+        margin-top: 32px;
+    }
+
+    .works-list {
+        gap: 16px;
+    }
+
+    .works-list li {
+        flex-basis: min(280px, calc(100vw - 32px));
+    }
+}
