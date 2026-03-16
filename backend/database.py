@@ -38,6 +38,29 @@ async def get_works_list_db(section_name: str) -> list[ClosedWorkSchema]:
         raise WorkLoadError from e
 
 
+async def get_random_works_list_db() -> list[ClosedWorkSchema]:
+    query = text("SELECT work_id, title, caption, img_name FROM works ORDER BY RANDOM()")
+
+    try:
+        async with new_session() as session:
+            result = await session.execute(query)
+            works_rows = result.mappings().all()
+
+            return [
+                ClosedWorkSchema(
+                    id=row["work_id"],
+                    title=row["title"],
+                    caption=row["caption"],
+                    img_name=row["img_name"],
+                )
+                for row in works_rows
+            ]
+
+    except Exception as e:
+        logger.exception(f"Ошибка при получении случайного списка работ: {str(e)}")
+        raise WorkLoadError from e
+
+
 async def get_work_db(work_id: int) -> OpenedWorkSchema:
     query = text("SELECT section_name, title, description, img_name FROM works WHERE work_id = :work_id")
 
