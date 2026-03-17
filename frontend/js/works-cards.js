@@ -89,6 +89,5 @@ function createWorkItem(work, index) {
     figure.append(media, figcaption);
     workLink.append(figure, details);
     workItem.append(workLink);
-
     return workItem;
 }
