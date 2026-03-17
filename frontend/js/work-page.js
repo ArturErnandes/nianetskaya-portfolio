@@ -22,6 +22,53 @@ function getWorkIdFromPath() {
     return workId;
 }
 
+function getCategoryPath(sectionName) {
+    return SECTIONS_CONFIG?.[sectionName] ? `/${sectionName}` : null;
+}
+
+function getReferrerPath() {
+    if (!document.referrer) {
+        return null;
+    }
+
+    const referrerUrl = new URL(document.referrer);
+
+    if (referrerUrl.origin !== window.location.origin) {
+        return null;
+    }
+
+    const referrerPath = referrerUrl.pathname;
+
+    if (referrerPath === "/") {
+        return referrerPath;
+    }
+
+    const sectionSlug = referrerPath.replace(/^\/+|\/+$/g, "");
+
+    if (SECTIONS_CONFIG?.[sectionSlug]) {
+        return `/${sectionSlug}`;
+    }
+
+    return null;
+}
+
+function getReturnPath(sectionName) {
+    const referrerPath = getReferrerPath();
+
+    if (referrerPath) {
+        sessionStorage.setItem("workReturnPath", referrerPath);
+        return referrerPath;
+    }
+
+    const storedPath = sessionStorage.getItem("workReturnPath");
+
+    if (storedPath === "/" || storedPath === getCategoryPath(sectionName)) {
+        return storedPath;
+    }
+
+    return getCategoryPath(sectionName);
+}
+
 async function fetchJson(url, errorMessage) {
     const response = await fetch(url);
 
@@ -106,8 +153,13 @@ async function initWorkPage() {
             throw new Error("Некорректный формат данных");
         }
 
-        backLink.href = `/${work.section_name}`;
-        backLink.setAttribute("aria-label", "Назад к категории");
+        const returnTo = getReturnPath(work.section_name);
+
+        backLink.href = returnTo || `/${work.section_name}`;
+        backLink.setAttribute(
+            "aria-label",
+            returnTo === "/" ? "Назад на главную" : "Назад к категории",
+        );
 
         renderWorkCard(workCard, work);
         worksList.replaceChildren(
