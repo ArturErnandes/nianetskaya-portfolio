@@ -18,6 +18,8 @@ def app_run():
 
     except Exception as e:
         logger.error(f"Ошибка при запуске FastAPI app: {str(e)}")
+
+
 app = FastAPI()
 
 app.add_middleware(
@@ -37,7 +39,7 @@ async def get_works_list(section_name: str):
         raise HTTPException(status_code=500, detail="load_error")
 
 
-@app.get("/api/random_works")
+@app.get("/api/random_works", tags=["Works"], summary="Получение случайного списка работ")
 async def get_random_works():
     try:
         return await get_random_works_list_db()
