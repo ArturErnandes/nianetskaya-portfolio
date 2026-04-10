@@ -36,3 +36,12 @@ class OpenedWorkSchema:
 class ProjectImageSchema:
     img_name: str
     description: str | None
+
+
+@dataclass(frozen=True)
+class OpenedProjectSchema:
+    section_name: str
+    title: str
+    caption: str
+    cover_img_name: str
+    images: list[ProjectImageSchema]
