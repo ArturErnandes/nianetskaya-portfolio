@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
-from .database import get_works_list_db, get_random_works_list_db, get_work_db, get_projects_list_db
+from .database import get_works_list_db, get_random_works_list_db, get_work_db, get_projects_list_db, get_project_db
 from .config import AppConfig
 from .exceptions import WorkLoadError, WorkNotFoundError
 from .logger import get_logger
@@ -59,5 +59,15 @@ async def get_work(work_id: int):
 async def get_projects(section_name: str | None):
     try:
         return await get_projects_list_db(section_name)
+    except WorkLoadError:
+        raise HTTPException(status_code=500, detail="load_error")
+
+
+@app.get("/api/projects/{project_id}", tags=["Projects"], summary="Получение данных указанного проекта")
+async def get_project(project_id: int):
+    try:
+        return await get_project_db(project_id)
+    except WorkNotFoundError:
+        raise HTTPException(status_code=404, detail="not_found")
     except WorkLoadError:
         raise HTTPException(status_code=500, detail="load_error")
