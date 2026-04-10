@@ -30,3 +30,9 @@ class OpenedWorkSchema:
     title: str
     description: str
     img_name: str
+
+
+@dataclass(frozen=True)
+class ProjectImageSchema:
+    img_name: str
+    description: str | None
