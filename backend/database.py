@@ -87,4 +87,23 @@ async def get_work_db(work_id: int) -> OpenedWorkSchema:
 
 
 async def get_projects_list_db(section_name: str | None) -> list[ClosedEntitySchema]:
-    ...
+    query = text("SELECT project_id, title, caption, cover_img_name FROM projects WHERE (:section_name IS NULL OR section_name = :section_name) ORDER BY project_id")
+
+    try:
+        async with new_session() as session:
+            result = await session.execute(query, {"section_name": section_name})
+            projects_rows = result.mappings().all()
+
+            return [
+                ClosedEntitySchema(
+                    id=row["project_id"],
+                    title=row["title"],
+                    caption=row["caption"],
+                    img_name=row["cover_img_name"],
+                )
+                for row in projects_rows
+            ]
+
+    except Exception as e:
+        logger.error(f"Ошибка при получении проектов категории {section_name}: {str(e)}")
+        raise WorkLoadError from e
