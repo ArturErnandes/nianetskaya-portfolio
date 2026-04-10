@@ -42,6 +42,6 @@ class ProjectImageSchema:
 class OpenedProjectSchema:
     section_name: str
     title: str
-    caption: str
+    description: str
     cover_img_name: str
     images: list[ProjectImageSchema]
