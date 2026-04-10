@@ -2,7 +2,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
 from .config import DbConfig
-from .classes import ClosedWorkSchema, OpenedWorkSchema
+from .classes import ClosedEntitySchema, OpenedWorkSchema
 from .exceptions import WorkLoadError, WorkNotFoundError
 from.logger import get_logger
 
@@ -15,7 +15,7 @@ engine = create_async_engine(
 new_session = async_sessionmaker(engine, expire_on_commit=False)
 
 
-async def get_works_list_db(section_name: str) -> list[ClosedWorkSchema]:
+async def get_works_list_db(section_name: str) -> list[ClosedEntitySchema]:
     query = text("SELECT work_id, title, caption, img_name FROM works WHERE section_name = :section_name ORDER BY work_id")
 
     try:
@@ -24,7 +24,7 @@ async def get_works_list_db(section_name: str) -> list[ClosedWorkSchema]:
             works_rows = result.mappings().all()
 
             return [
-                ClosedWorkSchema(
+                ClosedEntitySchema(
                     id=row["work_id"],
                     title=row["title"],
                     caption=row["caption"],
@@ -38,7 +38,7 @@ async def get_works_list_db(section_name: str) -> list[ClosedWorkSchema]:
         raise WorkLoadError from e
 
 
-async def get_random_works_list_db() -> list[ClosedWorkSchema]:
+async def get_random_works_list_db() -> list[ClosedEntitySchema]:
     query = text("SELECT work_id, title, caption, img_name FROM works ORDER BY RANDOM()")
 
     try:
@@ -47,7 +47,7 @@ async def get_random_works_list_db() -> list[ClosedWorkSchema]:
             works_rows = result.mappings().all()
 
             return [
-                ClosedWorkSchema(
+                ClosedEntitySchema(
                     id=row["work_id"],
                     title=row["title"],
                     caption=row["caption"],
