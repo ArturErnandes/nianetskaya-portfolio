@@ -2,7 +2,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
 from .config import DbConfig
-from .classes import ClosedEntitySchema, OpenedWorkSchema
+from .classes import ClosedEntitySchema, OpenedWorkSchema, OpenedProjectSchema, ProjectImageSchema
 from .exceptions import WorkLoadError, WorkNotFoundError
 from.logger import get_logger
 
@@ -106,4 +106,59 @@ async def get_projects_list_db(section_name: str | None) -> list[ClosedEntitySch
 
     except Exception as e:
         logger.error(f"Ошибка при получении проектов категории {section_name}: {str(e)}")
+        raise WorkLoadError from e
+
+
+async def get_project_images_db(project_id: int) -> list[ProjectImageSchema]:
+    query = text(
+        "SELECT img_name, description FROM project_images "
+        "WHERE project_id = :project_id ORDER BY order_index"
+    )
+
+    try:
+        async with new_session() as session:
+            result = await session.execute(query, {"project_id": project_id})
+            images_rows = result.mappings().all()
+
+            return [
+                ProjectImageSchema(
+                    img_name=row["img_name"],
+                    description=row["description"],
+                )
+                for row in images_rows
+            ]
+
+    except Exception as e:
+        logger.error(f"Ошибка при получении изображений проекта | id: {project_id} | Ошибка: {str(e)}")
+        raise WorkLoadError from e
+
+
+async def get_project_db(project_id: int) -> OpenedProjectSchema:
+    project_query = text(
+        "SELECT section_name, title, description, cover_img_name "
+        "FROM projects WHERE project_id = :project_id"
+    )
+
+    try:
+        async with new_session() as session:
+            project_result = await session.execute(project_query, {"project_id": project_id})
+            project_data = project_result.mappings().first()
+
+            if project_data is None:
+                raise WorkNotFoundError
+
+            images = await get_project_images_db(project_id)
+
+            return OpenedProjectSchema(
+                section_name=project_data["section_name"],
+                title=project_data["title"],
+                description=project_data["description"],
+                cover_img_name=project_data["cover_img_name"],
+                images=images,
+            )
+
+    except WorkNotFoundError:
+        raise
+    except Exception as e:
+        logger.error(f"Ошибка при получении проекта | id: {project_id} | Ошибка: {str(e)}")
         raise WorkLoadError from e
