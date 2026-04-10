@@ -17,7 +17,7 @@ class DbConfig:
 
 
 @dataclass(frozen=True)
-class ClosedWorkSchema:
+class ClosedEntitySchema:
     id: int
     title: str
     caption: str
