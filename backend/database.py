@@ -34,7 +34,7 @@ async def get_works_list_db(section_name: str) -> list[ClosedEntitySchema]:
             ]
 
     except Exception as e:
-        logger.exception(f"Ошибка при получении работ категории {section_name}: {str(e)}")
+        logger.error(f"Ошибка при получении работ категории {section_name}: {str(e)}")
         raise WorkLoadError from e
 
 
@@ -57,7 +57,7 @@ async def get_random_works_list_db() -> list[ClosedEntitySchema]:
             ]
 
     except Exception as e:
-        logger.exception(f"Ошибка при получении случайного списка работ: {str(e)}")
+        logger.error(f"Ошибка при получении случайного списка работ: {str(e)}")
         raise WorkLoadError from e
 
 
@@ -82,5 +82,9 @@ async def get_work_db(work_id: int) -> OpenedWorkSchema:
     except WorkNotFoundError:
         raise
     except Exception as e:
-        logger.exception(f"Ошибка при получении работы | id: {work_id} | Ошибка: {str(e)}")
+        logger.error(f"Ошибка при получении работы | id: {work_id} | Ошибка: {str(e)}")
         raise WorkLoadError from e
+
+
+async def get_projects_list_db(section_name: str | None) -> list[ClosedEntitySchema]:
+    ...
