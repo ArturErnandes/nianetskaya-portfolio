@@ -6,6 +6,14 @@
  * @property {string} img_name
  */
 
+/**
+ * @typedef {Object} Project
+ * @property {number} id
+ * @property {string} title
+ * @property {string} caption
+ * @property {string} img_name
+ */
+
 function revealImage(image, skeleton) {
     const showImage = async () => {
         try {
@@ -54,7 +62,19 @@ function revealStaticImage(image) {
     }
 }
 
-function createWorkItem(work, index) {
+function createInfoBadge() {
+    const badge = document.createElement("span");
+    const badgeInner = document.createElement("span");
+
+    badge.className = "project-info-badge";
+    badge.setAttribute("aria-hidden", "true");
+    badgeInner.textContent = "i";
+    badge.append(badgeInner);
+
+    return badge;
+}
+
+function createCardItem(entity, index, options = {}) {
     const workItem = document.createElement("li");
     const workLink = document.createElement("a");
     const figure = document.createElement("figure");
@@ -66,28 +86,57 @@ function createWorkItem(work, index) {
     const caption = document.createElement("p");
     const details = document.createElement("span");
 
-    workItem.className = "work-item";
+    const {
+        itemClassName = "work-item",
+        href = null,
+        showInfoBadge = false,
+    } = options;
+
+    workItem.className = itemClassName;
     workItem.style.animationDelay = `${index * 80}ms`;
-    workLink.href = `/work/${work.id}`;
+
+    if (href) {
+        workLink.href = href;
+    }
 
     media.className = "work-media";
     image.className = "work-image";
     imageSkeleton.className = "work-image-skeleton skeleton-block";
 
-    image.alt = work.title;
+    image.alt = entity.title;
     image.loading = "lazy";
     image.decoding = "async";
-    image.src = `${WORKS_ASSETS_PATH}/${work.img_name}`;
+    image.src = `${WORKS_ASSETS_PATH}/${entity.img_name}`;
     revealImage(image, imageSkeleton);
 
-    title.textContent = work.title;
-    caption.textContent = work.caption;
+    title.textContent = entity.title;
+    caption.textContent = entity.caption;
     details.textContent = "подробнее";
 
     figcaption.append(title, caption);
     media.append(image, imageSkeleton);
+
+    if (showInfoBadge) {
+        media.append(createInfoBadge());
+    }
+
     figure.append(media, figcaption);
     workLink.append(figure, details);
     workItem.append(workLink);
+
     return workItem;
+}
+
+function createWorkItem(work, index) {
+    return createCardItem(work, index, {
+        itemClassName: "work-item",
+        href: `/work/${work.id}`,
+    });
+}
+
+function createProjectItem(project, index) {
+    return createCardItem(project, index, {
+        itemClassName: "work-item project-item",
+        showInfoBadge: true,
+    });
 }
