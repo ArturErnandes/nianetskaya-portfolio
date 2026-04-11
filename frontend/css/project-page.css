@@ -38,7 +38,7 @@
 
 .project-card p {
     margin: 12px 0 0;
-    max-width: 920px;
+    max-width: none;
     font-size: 18px;
     line-height: 1.45;
     color: #1f1f1f;
