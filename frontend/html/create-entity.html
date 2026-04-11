@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+      <meta charset="UTF-8">
+      <title>Винецкая</title>
+      <link rel="stylesheet" href="/frontend/css/create-entity.css">
+  </head>
+  <body data-page="create-entity">
+    <header class="admin-header">
+      <a class="back-link" href="/" aria-label="Назад на главную">&lt;</a>
+      <h1>создание</h1>
+    </header>
+    <main class="entity-layout">
+      <section class="entity-copy">
+        <h2>выберите тип сущности</h2>
+        <p class="entity-description">
+          Выберите, что вы хотите добавить в портфолио: отдельную работу или проект.
+        </p>
+      </section>
+      <section class="entity-actions">
+        <a class="entity-card" href="/admin/create-work">
+          <h3>создать работу</h3>
+          <p>Открыть форму добавления отдельной работы в выбранную категорию.</p>
+          <span>перейти</span>
+        </a>
+        <a class="entity-card" href="/admin/create-project">
+          <h3>создать проект</h3>
+          <p>Перейти к созданию проекта с обложкой, описанием и набором изображений.</p>
+          <span>перейти</span>
+        </a>
+      </section>
+    </main>
+    <script src="/frontend/js/create-entity.js"></script>
+  </body>
+</html>
