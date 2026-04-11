@@ -17,6 +17,11 @@ class DbConfig:
 
 
 @dataclass(frozen=True)
+class AdminConfig:
+    password_hash: str
+
+
+@dataclass(frozen=True)
 class ClosedEntitySchema:
     id: int
     title: str
@@ -45,3 +50,20 @@ class OpenedProjectSchema:
     description: str
     cover_img_name: str
     images: list[ProjectImageSchema]
+
+
+@dataclass(frozen=True)
+class AdminLoginRequest:
+    password: str
+
+
+@dataclass(frozen=True)
+class AdminAuthResponse:
+    ok: bool
+
+
+@dataclass(frozen=True)
+class AdminSessionData:
+    role: str
+    exp: int
+    iat: int
