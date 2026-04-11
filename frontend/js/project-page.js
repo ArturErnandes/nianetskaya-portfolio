@@ -33,6 +33,10 @@ function getCategoryPath(sectionName) {
     return SECTIONS_CONFIG?.[sectionName] ? `/${sectionName}` : null;
 }
 
+function getCategoryHeading(sectionName) {
+    return SECTIONS_CONFIG?.[sectionName]?.heading || sectionName;
+}
+
 function getReferrerPath() {
     if (!document.referrer) {
         return null;
@@ -175,8 +179,9 @@ async function initProjectPage() {
     const projectCard = document.querySelector(".project-card");
     const worksList = document.querySelector(".works-list");
     const backLink = document.querySelector(".back-link");
+    const headerTitle = document.querySelector("[data-entity-header-title]");
 
-    if (!projectId || !projectCard || !worksList || !backLink) {
+    if (!projectId || !projectCard || !worksList || !backLink || !headerTitle) {
         if (projectCard && worksList) {
             showMissingProjectState(projectCard, worksList);
         }
@@ -208,6 +213,7 @@ async function initProjectPage() {
             "aria-label",
             returnTo === "/" ? "Назад на главную" : "Назад к категории",
         );
+        headerTitle.textContent = `${getCategoryHeading(project.section_name)} "${project.title}"`;
 
         renderProject(projectCard, project);
         worksList.replaceChildren(...works.map(createWorkItem));

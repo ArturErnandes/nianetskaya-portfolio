@@ -26,6 +26,10 @@ function getCategoryPath(sectionName) {
     return SECTIONS_CONFIG?.[sectionName] ? `/${sectionName}` : null;
 }
 
+function getCategoryHeading(sectionName) {
+    return SECTIONS_CONFIG?.[sectionName]?.heading || sectionName;
+}
+
 function getReferrerPath() {
     if (!document.referrer) {
         return null;
@@ -127,8 +131,9 @@ async function initWorkPage() {
     const workCard = document.querySelector(".work-card");
     const worksList = document.querySelector(".works-list");
     const backLink = document.querySelector(".back-link");
+    const headerTitle = document.querySelector("[data-entity-header-title]");
 
-    if (!workId || !workCard || !worksList || !backLink) {
+    if (!workId || !workCard || !worksList || !backLink || !headerTitle) {
         if (workCard && worksList) {
             showMissingWorkState(workCard, worksList);
         }
@@ -160,6 +165,7 @@ async function initWorkPage() {
             "aria-label",
             returnTo === "/" ? "Назад на главную" : "Назад к категории",
         );
+        headerTitle.textContent = `${getCategoryHeading(work.section_name)} "${work.title}"`;
 
         renderWorkCard(workCard, work);
         worksList.replaceChildren(
