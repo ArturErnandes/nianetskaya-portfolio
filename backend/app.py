@@ -44,6 +44,17 @@ app.add_middleware(
 )
 
 
+def serve_protected_admin_page(request: Request, file_name: str, fallback_heading: str):
+    if not has_admin_access(request):
+        raise HTTPException(status_code=401, detail="unauthorized")
+
+    html_path = FRONTEND_HTML_DIR / file_name
+    if html_path.exists():
+        return FileResponse(html_path)
+
+    return HTMLResponse(f"<h1>{fallback_heading}</h1>")
+
+
 @app.get("/api/works", tags=["Works"], summary="Получение списка работ указанной категории")
 async def get_works_list(section_name: str):
     try:
@@ -105,13 +116,11 @@ async def admin_logout():
     return response
 
 
+@app.get("/admin/create-entity", tags=["Admin"], summary="Защищенная страница выбора типа сущности")
+async def admin_create_entity_page(request: Request):
+    return serve_protected_admin_page(request, "create-entity.html", "Admin Create Entity")
+
+
 @app.get("/admin/create-work", tags=["Admin"], summary="Защищенная страница создания работы")
 async def admin_create_work_page(request: Request):
-    if not has_admin_access(request):
-        raise HTTPException(status_code=401, detail="unauthorized")
-
-    create_work_html_path = FRONTEND_HTML_DIR / "admin-create-work.html"
-    if create_work_html_path.exists():
-        return FileResponse(create_work_html_path)
-
-    return HTMLResponse("<h1>Admin Create Work</h1>")
+    return serve_protected_admin_page(request, "admin-create-work.html", "Admin Create Work")
