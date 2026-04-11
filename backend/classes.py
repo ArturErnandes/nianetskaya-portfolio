@@ -67,3 +67,12 @@ class AdminSessionData:
     role: str
     exp: int
     iat: int
+
+
+@dataclass(frozen=True)
+class WorkCreateSchema:
+    section_name: str
+    title: str
+    caption: str
+    description: str
+    img_name: str | None = None
