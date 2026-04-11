@@ -51,7 +51,7 @@ async function handleLoginSubmit(event) {
             return;
         }
 
-        window.location.assign("/admin/create-work");
+        window.location.assign("/admin/create-entity");
     } catch (error) {
         console.error("Ошибка при авторизации:", error);
         setLoginError("Ошибка сети. Попробуйте еще раз");
