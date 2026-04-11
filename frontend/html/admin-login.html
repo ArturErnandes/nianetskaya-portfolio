@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+      <meta charset="UTF-8">
+      <title>Винецкая</title>
+      <link rel="stylesheet" href="/frontend/css/admin-login.css">
+  </head>
+  <body data-page="admin-login">
+    <header class="admin-header">
+      <a class="back-link" href="/" aria-label="Назад на главную">&lt;</a>
+      <h1>вход</h1>
+    </header>
+    <main class="login-layout">
+      <section class="login-copy">
+        <h2>авторизация администратора</h2>
+        <p class="login-description">
+          Введите пароль, чтобы перейти к созданию работ
+        </p>
+      </section>
+      <section class="login-panel">
+        <form class="login-form" data-login-form novalidate>
+          <label class="login-field">
+            <span>пароль</span>
+            <input
+                id="admin_password"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                required
+            >
+          </label>
+          <p class="login-error" data-login-error aria-live="polite"></p>
+          <button class="login-submit" type="submit">войти</button>
+        </form>
+      </section>
+    </main>
+    <script src="/frontend/js/config.js"></script>
+    <script src="/frontend/js/admin-login.js"></script>
+  </body>
+</html>
