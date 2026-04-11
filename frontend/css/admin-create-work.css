@@ -73,13 +73,37 @@ h1 { margin: 0; font-size: 35px; font-weight: 400; line-height: 1.2; }
 
 .create-work-field textarea {
     min-height: 170px;
-    resize: vertical;
+    resize: none;
 }
 
 .create-work-field input:focus,
 .create-work-field textarea:focus,
 .create-work-field select:focus {
     border-color: #5a5a5a;
+}
+
+.create-work-select {
+    position: relative;
+    display: block;
+}
+
+.create-work-select::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 18px;
+    width: 9px;
+    height: 9px;
+    border-right: 1.5px solid #5a5a5a;
+    border-bottom: 1.5px solid #5a5a5a;
+    transform: translateY(-62%) rotate(45deg);
+    pointer-events: none;
+}
+
+.create-work-select select {
+    appearance: none;
+    padding-right: 44px;
+    background: #fff;
 }
 
 .create-work-status { min-height: 16px; margin: 0; color: #8d2d2d; }
