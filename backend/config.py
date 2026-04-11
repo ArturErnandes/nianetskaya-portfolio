@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from .classes import AppConfig, DbConfig
+from .classes import AppConfig, DbConfig, AdminConfig
 
 CONFIG_FILE = Path(__file__).parent.parent / "data.json"
 
@@ -25,4 +25,9 @@ DbConfig = DbConfig(
     host=config["database"]["host"],
     port=int(config["database"]["port"]),
     db_name=config["database"]["db_name"],
+)
+
+
+AdminConfig = AdminConfig(
+    password_hash=config["admin"]["password_hash"],
 )
