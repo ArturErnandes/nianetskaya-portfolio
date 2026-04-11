@@ -3,7 +3,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 import uvicorn
 
 from .database import get_works_list_db, get_random_works_list_db, get_work_db, get_projects_list_db, get_project_db
@@ -108,7 +108,7 @@ async def admin_logout():
 @app.get("/admin/create-work", tags=["Admin"], summary="Защищенная страница создания работы")
 async def admin_create_work_page(request: Request):
     if not has_admin_access(request):
-        return RedirectResponse(url="/admin/login", status_code=302)
+        raise HTTPException(status_code=401, detail="unauthorized")
 
     create_work_html_path = FRONTEND_HTML_DIR / "admin-create-work.html"
     if create_work_html_path.exists():
