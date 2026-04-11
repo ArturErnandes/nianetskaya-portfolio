@@ -137,6 +137,7 @@ function createWorkItem(work, index) {
 function createProjectItem(project, index) {
     return createCardItem(project, index, {
         itemClassName: "work-item project-item",
+        href: `/project/${project.id}`,
         showInfoBadge: true,
     });
 }
