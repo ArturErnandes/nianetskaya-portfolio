@@ -1,8 +1,11 @@
-const WORKS_ASSETS_PATH = "/assets/works";
+const WORKS_ASSETS_PATH = "https://nianetskaya.ru/assets/works";
+const API_BASE_URL = "https://nianetskaya.ru";
+
 
 const API_ENDPOINTS = {
-    works: `/api/works`,
-    randomWorks: `/api/random_works`,
+    works: `${API_BASE_URL}/api/works`,
+    projects: `${API_BASE_URL}/api/projects`,
+    randomWorks: `${API_BASE_URL}/api/random_works`,
 };
 
 const SECTIONS_CONFIG = {
