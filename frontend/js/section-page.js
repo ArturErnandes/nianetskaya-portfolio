@@ -27,27 +27,46 @@ async function loadSectionWorks(sectionName) {
 
     worksSection.dataset.sectionName = sectionName;
 
-    const requestUrl = `${API_ENDPOINTS.works}?section_name=${encodeURIComponent(sectionName)}`;
+    const worksRequestUrl = `${API_ENDPOINTS.works}?section_name=${encodeURIComponent(sectionName)}`;
+    const projectsRequestUrl = `${API_ENDPOINTS.projects}?section_name=${encodeURIComponent(sectionName)}`;
 
     try {
-        const response = await fetch(requestUrl);
+        const [projectsResponse, worksResponse] = await Promise.all([
+            fetch(projectsRequestUrl),
+            fetch(worksRequestUrl),
+        ]);
 
-        if (!response.ok) {
-            console.error(`Ошибка ответа API: ${response.status}`);
+        if (!projectsResponse.ok) {
+            console.error(`Ошибка ответа API проектов: ${projectsResponse.status}`);
             return;
         }
 
+        if (!worksResponse.ok) {
+            console.error(`Ошибка ответа API работ: ${worksResponse.status}`);
+            return;
+        }
+
+        /** @type {Project[]} */
+        const projects = await projectsResponse.json();
         /** @type {Work[]} */
-        const works = await response.json();
+        const works = await worksResponse.json();
+
+        if (!Array.isArray(projects)) {
+            console.error("Некорректный формат данных проектов");
+            return;
+        }
 
         if (!Array.isArray(works)) {
             console.error("Некорректный формат данных работ");
             return;
         }
 
-        worksList.replaceChildren(...works.map(createWorkItem));
+        const projectItems = projects.map(createProjectItem);
+        const workItems = works.map((work, index) => createWorkItem(work, index + projectItems.length));
+
+        worksList.replaceChildren(...projectItems, ...workItems);
     } catch (error) {
-        console.error("Ошибка при загрузке работ:", error);
+        console.error("Ошибка при загрузке работ и проектов:", error);
     }
 }
 
