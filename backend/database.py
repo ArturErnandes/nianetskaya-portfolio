@@ -2,8 +2,8 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
 from .config import DbConfig
-from .classes import ClosedEntitySchema, OpenedWorkSchema, OpenedProjectSchema, ProjectImageSchema
-from .exceptions import WorkLoadError, WorkNotFoundError
+from .classes import ClosedEntitySchema, OpenedWorkSchema, OpenedProjectSchema, ProjectImageSchema, WorkCreateSchema
+from .exceptions import WorkCreateError, WorkLoadError, WorkNotFoundError
 from.logger import get_logger
 
 
@@ -166,3 +166,35 @@ async def get_project_db(project_id: int) -> OpenedProjectSchema:
     except Exception as e:
         logger.error(f"Ошибка при получении проекта | id: {project_id} | Ошибка: {str(e)}")
         raise WorkLoadError from e
+
+
+async def create_work_db(work: WorkCreateSchema) -> int:
+    if work.img_name is None:
+        raise WorkCreateError
+
+    query = text(
+        "INSERT INTO works (section_name, title, caption, description, img_name) "
+        "VALUES (:section_name, :title, :caption, :description, :img_name) "
+        "RETURNING work_id"
+    )
+
+    try:
+        async with new_session() as session:
+            result = await session.execute(
+                query,
+                {
+                    "section_name": work.section_name,
+                    "title": work.title,
+                    "caption": work.caption,
+                    "description": work.description,
+                    "img_name": work.img_name,
+                },
+            )
+            await session.commit()
+            created_work_id = result.scalar_one()
+
+            return int(created_work_id)
+
+    except Exception as e:
+        logger.error(f"Ошибка при создании работы | title: {work.title} | Ошибка: {str(e)}")
+        raise WorkCreateError from e
