@@ -1,14 +1,14 @@
 from dataclasses import asdict
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
+from fastapi.responses import JSONResponse
 import uvicorn
 
 from .database import get_works_list_db, get_random_works_list_db, get_work_db, get_projects_list_db, get_project_db
 from .config import AppConfig
-from .exceptions import WorkLoadError, WorkNotFoundError
+from .exceptions import WorkCreateError, WorkLoadError, WorkNotFoundError
 from .logger import get_logger
 from .auth import (
     clear_admin_session_cookie,
@@ -16,8 +16,9 @@ from .auth import (
     set_admin_session_cookie,
     verify_admin_password,
 )
-from .classes import AdminAuthResponse, AdminLoginRequest
+from .classes import AdminAuthResponse, AdminLoginRequest, WorkCreateSchema
 from .config import AdminConfig
+from .handlers import create_work_handler, get_work_create_data, serve_protected_admin_page
 
 
 logger = get_logger(__name__)
@@ -34,6 +35,7 @@ def app_run():
 
 app = FastAPI()
 FRONTEND_HTML_DIR = Path(__file__).parent.parent / "frontend" / "html"
+WORKS_ASSETS_DIR = Path(__file__).parent.parent / "assets" / "works"
 
 app.add_middleware(
     CORSMiddleware,
@@ -42,18 +44,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-def serve_protected_admin_page(request: Request, file_name: str, fallback_heading: str):
-    if not has_admin_access(request):
-        raise HTTPException(status_code=401, detail="unauthorized")
-
-    html_path = FRONTEND_HTML_DIR / file_name
-    if html_path.exists():
-        return FileResponse(html_path)
-
-    return HTMLResponse(f"<h1>{fallback_heading}</h1>")
-
 
 @app.get("/api/works", tags=["Works"], summary="Получение списка работ указанной категории")
 async def get_works_list(section_name: str):
@@ -116,11 +106,28 @@ async def admin_logout():
     return response
 
 
+@app.post("/api/works/create", tags=["Works"], summary="Создание новой работы")
+async def create_work(
+    request: Request,
+    data: WorkCreateSchema = Depends(get_work_create_data),
+    image: UploadFile = File(...),
+):
+    if not has_admin_access(request):
+        raise HTTPException(status_code=401, detail="unauthorized")
+
+    try:
+        created_work_id = await create_work_handler(data, image, WORKS_ASSETS_DIR)
+    except WorkCreateError:
+        raise HTTPException(status_code=500, detail="create_error")
+
+    return JSONResponse({"id": created_work_id}, status_code=201)
+
+
 @app.get("/admin/create-entity", tags=["Admin"], summary="Защищенная страница выбора типа сущности")
 async def admin_create_entity_page(request: Request):
-    return serve_protected_admin_page(request, "create-entity.html", "Admin Create Entity")
+    return serve_protected_admin_page(request, "create-entity.html", "Admin Create Entity", FRONTEND_HTML_DIR)
 
 
 @app.get("/admin/create-work", tags=["Admin"], summary="Защищенная страница создания работы")
 async def admin_create_work_page(request: Request):
-    return serve_protected_admin_page(request, "admin-create-work.html", "Admin Create Work")
+    return serve_protected_admin_page(request, "admin-create-work.html", "Admin Create Work", FRONTEND_HTML_DIR)
