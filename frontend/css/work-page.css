@@ -40,8 +40,8 @@
 .work-content p {
     margin: 12px 0 0;
     max-width: 920px;
-    font-size: 13px;
-    line-height: 1.4;
+    font-size: 16px;
+    line-height: 1.55;
     color: #1f1f1f;
     white-space: pre-line;
 }
@@ -53,7 +53,7 @@
 
 .work-footer > h5 {
     margin: 0 0 18px;
-    font-size: 13px;
+    font-size: 16px;
     line-height: 1.2;
     font-weight: 400;
     color: #7f7f7f;
@@ -124,8 +124,17 @@
         margin-top: 16px;
     }
 
+    .work-content p {
+        font-size: 14px;
+        line-height: 1.45;
+    }
+
     .work-footer {
         margin-top: 32px;
+    }
+
+    .work-footer > h5 {
+        font-size: 14px;
     }
 
     .works-list {
