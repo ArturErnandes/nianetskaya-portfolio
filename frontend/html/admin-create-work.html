@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+      <meta charset="UTF-8">
+      <title>Винецкая</title>
+      <link rel="stylesheet" href="/frontend/css/admin-create-work.css">
+  </head>
+  <body data-page="admin-create-work">
+    <header class="admin-header">
+      <a class="back-link" href="/admin/create-entity" aria-label="Назад к выбору сущности">&lt;</a>
+      <h1>создать работу</h1>
+    </header>
+    <main class="create-work-layout">
+      <section class="create-work-copy">
+        <h2>новая работа</h2>
+        <p class="create-work-description">
+          Заполните данные работы и загрузите изображение. После сохранения работа появится в выбранной категории.
+        </p>
+      </section>
+      <section class="create-work-panel">
+        <form class="create-work-form" data-create-work-form novalidate>
+          <label class="create-work-field">
+            <span>тематика</span>
+            <select name="section_name" data-section-select required></select>
+          </label>
+          <label class="create-work-field">
+            <span>название работы</span>
+            <input name="title" type="text" required>
+          </label>
+          <label class="create-work-field">
+            <span>краткое описание</span>
+            <input name="caption" type="text" required>
+          </label>
+          <label class="create-work-field">
+            <span>подробное описание</span>
+            <textarea name="description" rows="7" required></textarea>
+          </label>
+          <label class="create-work-field">
+            <span>изображение</span>
+            <input name="image" type="file" accept="image/png,image/jpeg,image/webp" required>
+          </label>
+          <p class="create-work-status is-hidden" data-create-work-status aria-live="polite"></p>
+          <button class="create-work-submit" type="submit">сохранить</button>
+        </form>
+      </section>
+    </main>
+    <script src="/frontend/js/config.js"></script>
+    <script src="/frontend/js/admin-create-work.js"></script>
+  </body>
+</html>

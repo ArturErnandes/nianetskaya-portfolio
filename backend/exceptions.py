@@ -4,3 +4,7 @@ class WorkNotFoundError(Exception):
 
 class WorkLoadError(Exception):
     pass
+
+
+class WorkCreateError(Exception):
+    pass
