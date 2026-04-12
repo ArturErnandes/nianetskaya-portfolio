@@ -1,14 +1,14 @@
 from dataclasses import asdict
 from pathlib import Path
 
-from fastapi import Depends, FastAPI, File, HTTPException, Request, UploadFile
+from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import uvicorn
 
 from .database import get_works_list_db, get_random_works_list_db, get_work_db, get_projects_list_db, get_project_db
 from .config import AppConfig
-from .exceptions import WorkCreateError, WorkLoadError, WorkNotFoundError
+from .exceptions import ProjectCreateError, WorkCreateError, WorkLoadError, WorkNotFoundError
 from .logger import get_logger
 from .auth import (
     clear_admin_session_cookie,
@@ -16,9 +16,15 @@ from .auth import (
     set_admin_session_cookie,
     verify_admin_password,
 )
-from .classes import AdminAuthResponse, AdminLoginRequest, WorkCreateSchema
+from .classes import AdminAuthResponse, AdminLoginRequest, ProjectCreateSchema, WorkCreateSchema
 from .config import AdminConfig
-from .handlers import create_work_handler, get_work_create_data, serve_protected_admin_page
+from .handlers import (
+    create_project_handler,
+    create_work_handler,
+    get_project_create_data,
+    get_work_create_data,
+    serve_protected_admin_page,
+)
 
 
 logger = get_logger(__name__)
@@ -123,6 +129,25 @@ async def create_work(
     return JSONResponse({"id": created_work_id}, status_code=201)
 
 
+@app.post("/api/projects/create", tags=["Projects"], summary="Создание нового проекта")
+async def create_project(
+    request: Request,
+    data: ProjectCreateSchema = Depends(get_project_create_data),
+    cover_image: UploadFile = File(...),
+    gallery_images: list[UploadFile] = File(default=[]),
+    gallery_descriptions: list[str] = Form(default=[]),
+):
+    if not has_admin_access(request):
+        raise HTTPException(status_code=401, detail="unauthorized")
+
+    try:
+        created_project_id = await create_project_handler(data, cover_image, gallery_images, gallery_descriptions, WORKS_ASSETS_DIR)
+    except ProjectCreateError:
+        raise HTTPException(status_code=500, detail="create_error")
+
+    return JSONResponse({"id": created_project_id}, status_code=201)
+
+
 @app.get("/admin/create-entity", tags=["Admin"], summary="Защищенная страница выбора типа сущности")
 async def admin_create_entity_page(request: Request):
     return serve_protected_admin_page(request, "create-entity.html", "Admin Create Entity", FRONTEND_HTML_DIR)
@@ -131,3 +156,8 @@ async def admin_create_entity_page(request: Request):
 @app.get("/admin/create-work", tags=["Admin"], summary="Защищенная страница создания работы")
 async def admin_create_work_page(request: Request):
     return serve_protected_admin_page(request, "admin-create-work.html", "Admin Create Work", FRONTEND_HTML_DIR)
+
+
+@app.get("/admin/create-project", tags=["Admin"], summary="Защищенная страница создания проекта")
+async def admin_create_project_page(request: Request):
+    return serve_protected_admin_page(request, "admin-create-project.html", "Admin Create Project", FRONTEND_HTML_DIR)
