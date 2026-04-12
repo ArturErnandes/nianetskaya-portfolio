@@ -8,3 +8,7 @@ class WorkLoadError(Exception):
 
 class WorkCreateError(Exception):
     pass
+
+
+class ProjectCreateError(Exception):
+    pass
