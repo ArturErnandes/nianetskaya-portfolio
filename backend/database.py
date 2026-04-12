@@ -2,8 +2,16 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
 from .config import DbConfig
-from .classes import ClosedEntitySchema, OpenedWorkSchema, OpenedProjectSchema, ProjectImageSchema, WorkCreateSchema
-from .exceptions import WorkCreateError, WorkLoadError, WorkNotFoundError
+from .classes import (
+    ClosedEntitySchema,
+    OpenedProjectSchema,
+    OpenedWorkSchema,
+    ProjectCreateSchema,
+    ProjectImageCreateSchema,
+    ProjectImageSchema,
+    WorkCreateSchema,
+)
+from .exceptions import ProjectCreateError, WorkCreateError, WorkLoadError, WorkNotFoundError
 from.logger import get_logger
 
 
@@ -198,3 +206,55 @@ async def create_work_db(work: WorkCreateSchema) -> int:
     except Exception as e:
         logger.error(f"Ошибка при создании работы | title: {work.title} | Ошибка: {str(e)}")
         raise WorkCreateError from e
+
+
+async def create_project_db(project: ProjectCreateSchema) -> int:
+    if project.cover_img_name is None:
+        raise ProjectCreateError
+
+    project_query = text(
+        "INSERT INTO projects (section_name, title, caption, cover_img_name, description) "
+        "VALUES (:section_name, :title, :caption, :cover_img_name, :description) "
+        "RETURNING project_id"
+    )
+    image_query = text(
+        "INSERT INTO project_images (project_id, description, img_name, order_index) "
+        "VALUES (:project_id, :description, :img_name, :order_index)"
+    )
+
+    try:
+        async with new_session() as session:
+            project_result = await session.execute(
+                project_query,
+                {
+                    "section_name": project.section_name,
+                    "title": project.title,
+                    "caption": project.caption,
+                    "cover_img_name": project.cover_img_name,
+                    "description": project.description,
+                },
+            )
+            created_project_id = int(project_result.scalar_one())
+
+            for image in project.images or []:
+                if image.img_name is None:
+                    raise ProjectCreateError
+
+                await session.execute(
+                    image_query,
+                    {
+                        "project_id": created_project_id,
+                        "description": image.description,
+                        "img_name": image.img_name,
+                        "order_index": image.order_index,
+                    },
+                )
+
+            await session.commit()
+            return created_project_id
+
+    except ProjectCreateError:
+        raise
+    except Exception as e:
+        logger.error(f"Ошибка при создании проекта | title: {project.title} | Ошибка: {str(e)}")
+        raise ProjectCreateError from e
