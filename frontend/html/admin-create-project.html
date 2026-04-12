@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+      <meta charset="UTF-8">
+      <title>Винецкая</title>
+      <link rel="stylesheet" href="/frontend/css/admin-create-work.css">
+      <link rel="stylesheet" href="/frontend/css/admin-create-project.css">
+  </head>
+  <body data-page="admin-create-project">
+    <header class="admin-header">
+      <a class="back-link" href="/admin/create-entity" aria-label="Назад к выбору сущности">&lt;</a>
+      <h1>создать проект</h1>
+    </header>
+    <main class="create-work-layout">
+      <section class="create-work-copy">
+        <h2>новый проект</h2>
+        <p class="create-work-description">
+          Заполните основную информацию о проекте, загрузите обложку и добавьте любое количество дополнительных изображений с описаниями.
+        </p>
+      </section>
+      <section class="create-work-panel">
+        <form class="create-work-form" data-create-project-form novalidate>
+          <label class="create-work-field">
+            <span>тематика</span>
+            <span class="create-work-select">
+              <select name="section_name" data-section-select required></select>
+            </span>
+          </label>
+          <label class="create-work-field">
+            <span>название проекта</span>
+            <input name="title" type="text" required>
+          </label>
+          <label class="create-work-field">
+            <span>краткое описание</span>
+            <input name="caption" type="text" required>
+          </label>
+          <label class="create-work-field">
+            <span>подробное описание</span>
+            <textarea name="description" rows="7" required></textarea>
+          </label>
+          <label class="create-work-field">
+            <span>обложка проекта</span>
+            <input name="cover_image" type="file" accept="image/png,image/jpeg,image/webp" required>
+          </label>
+          <section class="project-gallery-builder">
+            <div class="project-gallery-builder-header">
+              <span>дополнительные изображения</span>
+              <button class="project-gallery-add" type="button" data-add-project-image>добавить изображение</button>
+            </div>
+            <div class="project-gallery-list" data-project-gallery-list></div>
+          </section>
+          <p class="create-work-status is-hidden" data-create-project-status aria-live="polite"></p>
+          <button class="create-work-submit" type="submit">сохранить</button>
+        </form>
+      </section>
+    </main>
+    <template data-project-image-template>
+      <article class="project-gallery-item-form">
+        <label class="create-work-field">
+          <span>изображение</span>
+          <input name="gallery_images" type="file" accept="image/png,image/jpeg,image/webp" required>
+        </label>
+        <label class="create-work-field">
+          <span>описание изображения</span>
+          <textarea name="gallery_descriptions" rows="4"></textarea>
+        </label>
+        <button class="project-gallery-remove" type="button">удалить</button>
+      </article>
+    </template>
+    <script src="/frontend/js/config.js"></script>
+    <script src="/frontend/js/admin-create-project.js"></script>
+  </body>
+</html>
