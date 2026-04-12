@@ -76,3 +76,20 @@ class WorkCreateSchema:
     caption: str
     description: str
     img_name: str | None = None
+
+
+@dataclass(frozen=True)
+class ProjectImageCreateSchema:
+    img_name: str | None = None
+    description: str | None = None
+    order_index: int = 0
+
+
+@dataclass(frozen=True)
+class ProjectCreateSchema:
+    section_name: str
+    title: str
+    caption: str
+    description: str
+    cover_img_name: str | None = None
+    images: list[ProjectImageCreateSchema] | None = None
