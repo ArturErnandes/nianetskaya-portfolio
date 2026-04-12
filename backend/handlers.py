@@ -5,9 +5,9 @@ from fastapi import Form, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse
 
 from .auth import has_admin_access
-from .classes import WorkCreateSchema
-from .database import create_work_db
-from .exceptions import WorkCreateError
+from .classes import ProjectCreateSchema, ProjectImageCreateSchema, WorkCreateSchema
+from .database import create_project_db, create_work_db
+from .exceptions import ProjectCreateError, WorkCreateError
 
 
 def serve_protected_admin_page(request: Request, file_name: str, fallback_heading: str, frontend_html_dir: Path):
@@ -72,3 +72,84 @@ async def create_work_handler(data: WorkCreateSchema, image: UploadFile, works_a
         if image_path.exists():
             image_path.unlink()
         raise WorkCreateError from error
+
+
+def get_project_create_data(
+    section_name: str = Form(...),
+    title: str = Form(...),
+    caption: str = Form(...),
+    description: str = Form(...),
+) -> ProjectCreateSchema:
+    return ProjectCreateSchema(
+        section_name=section_name.strip(),
+        title=title.strip(),
+        caption=caption.strip(),
+        description=description.strip(),
+        images=[],
+    )
+
+
+async def create_project_handler(
+    data: ProjectCreateSchema,
+    cover_image: UploadFile,
+    gallery_images: list[UploadFile],
+    gallery_descriptions: list[str],
+    works_assets_dir: Path,
+) -> int:
+    if not cover_image.filename:
+        raise HTTPException(status_code=400, detail="cover_image_required")
+
+    if len(gallery_images) != len(gallery_descriptions):
+        raise HTTPException(status_code=400, detail="gallery_mismatch")
+
+    saved_paths: list[Path] = []
+
+    async def save_image(upload: UploadFile) -> str:
+        if not upload.filename:
+            raise HTTPException(status_code=400, detail="image_required")
+
+        image_name = create_work_image_name(upload.filename)
+        image_bytes = await upload.read()
+
+        if not image_bytes:
+            raise HTTPException(status_code=400, detail="image_required")
+
+        works_assets_dir.mkdir(parents=True, exist_ok=True)
+        image_path = works_assets_dir / image_name
+        image_path.write_bytes(image_bytes)
+        saved_paths.append(image_path)
+        return image_name
+
+    try:
+        cover_img_name = await save_image(cover_image)
+        images: list[ProjectImageCreateSchema] = []
+
+        for index, (image, description) in enumerate(zip(gallery_images, gallery_descriptions, strict=False), start=1):
+            img_name = await save_image(image)
+            images.append(
+                ProjectImageCreateSchema(
+                    img_name=img_name,
+                    description=description.strip() or None,
+                    order_index=index,
+                ),
+            )
+
+        persisted_project = ProjectCreateSchema(
+            section_name=data.section_name,
+            title=data.title,
+            caption=data.caption,
+            description=data.description,
+            cover_img_name=cover_img_name,
+            images=images,
+        )
+        return await create_project_db(persisted_project)
+    except ProjectCreateError:
+        for path in saved_paths:
+            if path.exists():
+                path.unlink()
+        raise
+    except OSError as error:
+        for path in saved_paths:
+            if path.exists():
+                path.unlink()
+        raise ProjectCreateError from error
