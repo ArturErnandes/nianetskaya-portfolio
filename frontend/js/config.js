@@ -15,14 +15,8 @@ const SECTIONS_CONFIG = {
     graphic_design: {
         heading: "графический дизайн",
     },
-    portfolio_presentation_design: {
-        heading: "дизайн портфолио \\ презентаций",
-    },
-    art_objects: {
-        heading: "арт объекты",
-    },
-    painting: {
-        heading: "живопись",
+    academic_works: {
+        heading: "академические работы",
     },
     textile_design: {
         heading: "дизайн текстиля",
