@@ -109,6 +109,7 @@ function createCardItem(entity, index, options = {}) {
 
     title.textContent = entity.title;
     caption.textContent = entity.caption;
+    details.className = "work-details";
     details.textContent = "подробнее";
 
     figcaption.append(title, caption);
