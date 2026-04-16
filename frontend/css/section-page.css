@@ -94,15 +94,21 @@ h1 {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
+    min-height: 46px;
+    padding: 0;
+    margin: 0;
+    aspect-ratio: 1 / 1;
     border-radius: 50%;
     background-color: rgba(138, 138, 138, 0.92);
     color: #f7f7f7;
-    font-size: 42px;
-    font-weight: 300;
-    font-family: "Arial", sans-serif;
-    line-height: 1;
+    font-size: 33px;
+    font-weight: 400;
+    font-family: "Times New Roman", serif;
+    line-height: 0.85;
+    text-indent: 1px;
     box-shadow: none;
     pointer-events: none;
 }
@@ -146,7 +152,7 @@ h1 {
     font-weight: 700;
 }
 
-.works-list span {
+.work-details {
     display: block;
     width: fit-content;
     margin: 18px auto 0;
