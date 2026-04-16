@@ -14,7 +14,7 @@
  * @property {string} img_name
  */
 
-function revealImage(image, skeleton) {
+function revealImage(image, skeleton, fallbackSrc = null) {
     const showImage = async () => {
         try {
             if (typeof image.decode === "function") {
@@ -26,16 +26,31 @@ function revealImage(image, skeleton) {
 
         image.classList.add("is-loaded");
         skeleton.classList.add("is-hidden");
+        image.removeEventListener("error", handleError);
+    };
+
+    const handleError = () => {
+        if (fallbackSrc && image.dataset.fallbackApplied !== "1") {
+            image.dataset.fallbackApplied = "1";
+            image.src = fallbackSrc;
+            return;
+        }
+
+        skeleton.classList.add("is-hidden");
     };
 
     image.addEventListener("load", showImage, { once: true });
-    image.addEventListener("error", () => {
-        skeleton.classList.add("is-hidden");
-    }, { once: true });
+    image.addEventListener("error", handleError, { once: false });
 
     if (image.complete && image.naturalWidth > 0) {
         void showImage();
     }
+}
+
+function getThumbPathFromImageName(imageName) {
+    const dotIndex = imageName.lastIndexOf(".");
+    const baseName = dotIndex === -1 ? imageName : imageName.slice(0, dotIndex);
+    return `${WORKS_THUMBS_PATH}/${baseName}.webp`;
 }
 
 function revealStaticImage(image) {
@@ -101,11 +116,14 @@ function createCardItem(entity, index, options = {}) {
     image.className = "work-image";
     imageSkeleton.className = "work-image-skeleton skeleton-block";
 
+    const originalSrc = `${WORKS_ASSETS_PATH}/${entity.img_name}`;
+    const thumbSrc = getThumbPathFromImageName(entity.img_name);
+
     image.alt = entity.title;
     image.loading = "lazy";
     image.decoding = "async";
-    image.src = `${WORKS_ASSETS_PATH}/${entity.img_name}`;
-    revealImage(image, imageSkeleton);
+    image.src = thumbSrc;
+    revealImage(image, imageSkeleton, originalSrc);
 
     title.textContent = entity.title;
     caption.textContent = entity.caption;
