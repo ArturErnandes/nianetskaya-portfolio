@@ -8,6 +8,7 @@ from .auth import has_admin_access
 from .classes import ProjectCreateSchema, ProjectImageCreateSchema, WorkCreateSchema
 from .database import create_project_db, create_work_db
 from .exceptions import ProjectCreateError, WorkCreateError
+from .image_tools import create_thumbnail
 
 
 def serve_protected_admin_page(request: Request, file_name: str, fallback_heading: str, frontend_html_dir: Path):
@@ -53,9 +54,11 @@ async def create_work_handler(data: WorkCreateSchema, image: UploadFile, works_a
 
     works_assets_dir.mkdir(parents=True, exist_ok=True)
     image_path = works_assets_dir / image_name
+    thumbnail_path: Path | None = None
 
     try:
         image_path.write_bytes(image_bytes)
+        thumbnail_path = create_thumbnail(image_path, works_assets_dir)
         persisted_work = WorkCreateSchema(
             section_name=data.section_name,
             title=data.title,
@@ -65,10 +68,14 @@ async def create_work_handler(data: WorkCreateSchema, image: UploadFile, works_a
         )
         return await create_work_db(persisted_work)
     except WorkCreateError:
+        if thumbnail_path and thumbnail_path.exists():
+            thumbnail_path.unlink()
         if image_path.exists():
             image_path.unlink()
         raise
     except OSError as error:
+        if thumbnail_path and thumbnail_path.exists():
+            thumbnail_path.unlink()
         if image_path.exists():
             image_path.unlink()
         raise WorkCreateError from error
@@ -118,6 +125,7 @@ async def create_project_handler(
         image_path = works_assets_dir / image_name
         image_path.write_bytes(image_bytes)
         saved_paths.append(image_path)
+        saved_paths.append(create_thumbnail(image_path, works_assets_dir))
         return image_name
 
     try:
