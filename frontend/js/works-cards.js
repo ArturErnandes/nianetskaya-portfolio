@@ -68,7 +68,9 @@ function createInfoBadge() {
 
     badge.className = "project-info-badge";
     badge.setAttribute("aria-hidden", "true");
+    badgeInner.className = "project-info-badge__inner";
     badgeInner.textContent = "i";
+
     badge.append(badgeInner);
 
     return badge;
