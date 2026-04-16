@@ -89,34 +89,22 @@ h1 {
 
 .project-info-badge {
     position: absolute;
-    top: 12px;
-    right: 12px;
+    top: 14px;
+    right: 14px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 30px;
-    height: 30px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
-    background-color: rgba(244, 244, 244, 0.95);
-    border: 1px solid rgba(153, 153, 153, 0.5);
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
-    pointer-events: none;
-}
-
-.project-info-badge__inner {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    border: 1px solid rgba(115, 115, 115, 0.72);
-    color: #6d6d6d;
-    font-size: 11px;
-    font-weight: 600;
-    font-family: "Georgia", serif;
+    background-color: rgba(138, 138, 138, 0.92);
+    color: #f7f7f7;
+    font-size: 42px;
+    font-weight: 300;
+    font-family: "Arial", sans-serif;
     line-height: 1;
-    background-color: rgba(255, 255, 255, 0.65);
+    box-shadow: none;
+    pointer-events: none;
 }
 
 .work-image {
