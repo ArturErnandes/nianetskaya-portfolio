@@ -64,14 +64,10 @@ function revealStaticImage(image) {
 
 function createInfoBadge() {
     const badge = document.createElement("span");
-    const badgeInner = document.createElement("span");
 
     badge.className = "project-info-badge";
     badge.setAttribute("aria-hidden", "true");
-    badgeInner.className = "project-info-badge__inner";
-    badgeInner.textContent = "i";
-
-    badge.append(badgeInner);
+    badge.textContent = "i";
 
     return badge;
 }
