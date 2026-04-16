@@ -1,4 +1,5 @@
 const WORKS_ASSETS_PATH = "/assets/works";
+const WORKS_THUMBS_PATH = "/assets/works/thumbs";
 const API_ENDPOINTS = {
     works: "/api/works",
     projects: "/api/projects",
