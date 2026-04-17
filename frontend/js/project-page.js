@@ -184,6 +184,8 @@ async function initProjectPage() {
         return;
     }
 
+    renderWorksLoadingState(worksList, 5);
+
     try {
         /** @type {OpenedProject} */
         const project = await fetchJson(
