@@ -87,6 +87,34 @@ function createInfoBadge() {
     return badge;
 }
 
+function createWorkSkeletonItem(index) {
+    const item = document.createElement("li");
+    const figure = document.createElement("figure");
+    const media = document.createElement("div");
+    const imageSkeleton = document.createElement("div");
+
+    item.className = "work-item skeleton-card";
+    item.style.animationDelay = String(index * 80) + "ms";
+
+    media.className = "work-media";
+    imageSkeleton.className = "skeleton-image skeleton-block";
+
+    media.append(imageSkeleton);
+    figure.append(media);
+    item.append(figure);
+
+    return item;
+}
+
+function renderWorksLoadingState(worksList, count = 6) {
+    if (!(worksList instanceof HTMLElement)) {
+        return;
+    }
+
+    const skeletonItems = Array.from({ length: count }, (_, index) => createWorkSkeletonItem(index));
+    worksList.replaceChildren(...skeletonItems);
+}
+
 function createCardItem(entity, index, options = {}) {
     const workItem = document.createElement("li");
     const workLink = document.createElement("a");
