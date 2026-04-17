@@ -44,6 +44,28 @@ async function waitForImageReady(image) {
     return image.complete && image.naturalWidth > 0;
 }
 
+async function waitUntilConnected(element, maxFrames = 30) {
+    if (element.isConnected || typeof window.requestAnimationFrame !== "function") {
+        return;
+    }
+
+    await new Promise((resolve) => {
+        let framesLeft = maxFrames;
+
+        const tick = () => {
+            if (element.isConnected || framesLeft <= 0) {
+                resolve();
+                return;
+            }
+
+            framesLeft -= 1;
+            window.requestAnimationFrame(tick);
+        };
+
+        window.requestAnimationFrame(tick);
+    });
+}
+
 function revealImage(image, skeleton, fallbackSrc = null) {
     let imageRevealed = false;
     let loadHandled = false;
@@ -66,6 +88,19 @@ function revealImage(image, skeleton, fallbackSrc = null) {
         hideSkeleton();
     };
 
+    const reveal = async () => {
+        image.classList.add("is-loaded");
+
+        const transitionMs = getTransitionDurationMs(image);
+
+        if (transitionMs <= 0) {
+            hideSkeleton();
+            return;
+        }
+
+        image.addEventListener("transitionend", handleTransitionEnd, { once: true });
+    };
+
     const showImage = async () => {
         if (loadHandled) {
             return;
@@ -83,28 +118,18 @@ function revealImage(image, skeleton, fallbackSrc = null) {
             return;
         }
 
-        const reveal = () => {
-            image.classList.add("is-loaded");
-
-            const transitionMs = getTransitionDurationMs(image);
-
-            if (transitionMs <= 0) {
-                hideSkeleton();
-                return;
-            }
-
-            image.addEventListener("transitionend", handleTransitionEnd, { once: true });
-            window.setTimeout(hideSkeleton, transitionMs + 120);
-        };
+        await waitUntilConnected(image);
 
         if (typeof window.requestAnimationFrame === "function") {
             window.requestAnimationFrame(() => {
-                window.requestAnimationFrame(reveal);
+                window.requestAnimationFrame(() => {
+                    void reveal();
+                });
             });
             return;
         }
 
-        reveal();
+        await reveal();
     };
 
     const handleLoad = () => {
