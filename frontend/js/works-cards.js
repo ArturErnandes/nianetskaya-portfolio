@@ -14,8 +14,52 @@
  * @property {string} img_name
  */
 
+function getTransitionDurationMs(element) {
+    const style = window.getComputedStyle(element);
+    const durations = style.transitionDuration.split(",");
+
+    return durations.reduce((maxDuration, value) => {
+        const duration = parseFloat(value);
+
+        if (!Number.isFinite(duration)) {
+            return maxDuration;
+        }
+
+        // CSS duration may be in seconds or milliseconds.
+        const durationMs = value.trim().endsWith("ms") ? duration : duration * 1000;
+        return Math.max(maxDuration, durationMs);
+    }, 0);
+}
+
 function revealImage(image, skeleton, fallbackSrc = null) {
+    let imageRevealed = false;
+    let loadHandled = false;
+
+    const hideSkeleton = () => {
+        if (imageRevealed) {
+            return;
+        }
+
+        imageRevealed = true;
+        skeleton.classList.add("is-hidden");
+        image.removeEventListener("transitionend", handleTransitionEnd);
+    };
+
+    const handleTransitionEnd = (event) => {
+        if (event.propertyName && event.propertyName !== "opacity") {
+            return;
+        }
+
+        hideSkeleton();
+    };
+
     const showImage = async () => {
+        if (loadHandled) {
+            return;
+        }
+
+        loadHandled = true;
+
         try {
             if (typeof image.decode === "function") {
                 await image.decode();
@@ -24,22 +68,47 @@ function revealImage(image, skeleton, fallbackSrc = null) {
             // Ignore decode failures and reveal the loaded image anyway.
         }
 
-        image.classList.add("is-loaded");
-        skeleton.classList.add("is-hidden");
+        image.removeEventListener("load", handleLoad);
         image.removeEventListener("error", handleError);
+
+        const reveal = () => {
+            image.classList.add("is-loaded");
+
+            const transitionMs = getTransitionDurationMs(image);
+
+            if (transitionMs <= 0) {
+                hideSkeleton();
+                return;
+            }
+
+            image.addEventListener("transitionend", handleTransitionEnd, { once: true });
+            window.setTimeout(hideSkeleton, transitionMs + 60);
+        };
+
+        if (typeof window.requestAnimationFrame === "function") {
+            window.requestAnimationFrame(reveal);
+            return;
+        }
+
+        reveal();
+    };
+
+    const handleLoad = () => {
+        void showImage();
     };
 
     const handleError = () => {
         if (fallbackSrc && image.dataset.fallbackApplied !== "1") {
             image.dataset.fallbackApplied = "1";
+            loadHandled = false;
             image.src = fallbackSrc;
             return;
         }
 
-        skeleton.classList.add("is-hidden");
+        hideSkeleton();
     };
 
-    image.addEventListener("load", showImage, { once: true });
+    image.addEventListener("load", handleLoad, { once: true });
     image.addEventListener("error", handleError, { once: false });
 
     if (image.complete && image.naturalWidth > 0) {
@@ -94,7 +163,7 @@ function createWorkSkeletonItem(index) {
     const imageSkeleton = document.createElement("div");
 
     item.className = "work-item skeleton-card";
-    item.style.animationDelay = String(index * 80) + "ms";
+    item.style.animationDelay = `${index * 80}ms`;
 
     media.className = "work-media";
     imageSkeleton.className = "skeleton-image skeleton-block";
