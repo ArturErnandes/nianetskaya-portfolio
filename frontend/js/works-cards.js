@@ -14,6 +14,17 @@
  * @property {string} img_name
  */
 
+const IMAGE_PROBE_CANVAS = document.createElement("canvas");
+IMAGE_PROBE_CANVAS.width = 1;
+IMAGE_PROBE_CANVAS.height = 1;
+const IMAGE_PROBE_CONTEXT = IMAGE_PROBE_CANVAS.getContext("2d");
+
+function sleep(ms) {
+    return new Promise((resolve) => {
+        window.setTimeout(resolve, ms);
+    });
+}
+
 function getTransitionDurationMs(element) {
     const style = window.getComputedStyle(element);
     const durations = style.transitionDuration.split(",");
@@ -29,6 +40,46 @@ function getTransitionDurationMs(element) {
         const durationMs = value.trim().endsWith("ms") ? duration : duration * 1000;
         return Math.max(maxDuration, durationMs);
     }, 0);
+}
+
+function isImageDrawable(image) {
+    if (!IMAGE_PROBE_CONTEXT || !image.complete || image.naturalWidth <= 0 || image.naturalHeight <= 0) {
+        return false;
+    }
+
+    try {
+        IMAGE_PROBE_CONTEXT.clearRect(0, 0, 1, 1);
+        IMAGE_PROBE_CONTEXT.drawImage(image, 0, 0, 1, 1);
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+
+async function waitForImageReady(image, maxWaitMs = 12000) {
+    const startedAt = Date.now();
+
+    while (Date.now() - startedAt < maxWaitMs) {
+        if (isImageDrawable(image)) {
+            return true;
+        }
+
+        if (typeof image.decode === "function") {
+            try {
+                await image.decode();
+            } catch (error) {
+                // Ignore and keep waiting until image becomes drawable.
+            }
+        }
+
+        if (isImageDrawable(image)) {
+            return true;
+        }
+
+        await sleep(120);
+    }
+
+    return isImageDrawable(image);
 }
 
 function revealImage(image, skeleton, fallbackSrc = null) {
@@ -60,21 +111,21 @@ function revealImage(image, skeleton, fallbackSrc = null) {
 
         loadHandled = true;
 
-        try {
-            if (typeof image.decode === "function") {
-                await image.decode();
-            }
-        } catch (error) {
-            // Ignore decode failures and reveal the loaded image anyway.
-        }
-
         image.removeEventListener("load", handleLoad);
         image.removeEventListener("error", handleError);
+
+        const isReady = await waitForImageReady(image);
 
         const reveal = () => {
             image.classList.add("is-loaded");
 
             const transitionMs = getTransitionDurationMs(image);
+
+            if (!isReady) {
+                // If readiness probe timed out, keep skeleton longer to avoid white gap.
+                window.setTimeout(hideSkeleton, Math.max(transitionMs + 120, 1600));
+                return;
+            }
 
             if (transitionMs <= 0) {
                 hideSkeleton();
@@ -82,11 +133,13 @@ function revealImage(image, skeleton, fallbackSrc = null) {
             }
 
             image.addEventListener("transitionend", handleTransitionEnd, { once: true });
-            window.setTimeout(hideSkeleton, transitionMs + 60);
+            window.setTimeout(hideSkeleton, transitionMs + 120);
         };
 
         if (typeof window.requestAnimationFrame === "function") {
-            window.requestAnimationFrame(reveal);
+            window.requestAnimationFrame(() => {
+                window.requestAnimationFrame(reveal);
+            });
             return;
         }
 
@@ -105,7 +158,8 @@ function revealImage(image, skeleton, fallbackSrc = null) {
             return;
         }
 
-        hideSkeleton();
+        // Keep skeleton visible as a stable placeholder when image failed to load.
+        image.removeEventListener("load", handleLoad);
     };
 
     image.addEventListener("load", handleLoad, { once: true });
