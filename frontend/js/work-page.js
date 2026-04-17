@@ -122,8 +122,7 @@ function renderWorkCard(workCard, work) {
     image.loading = "eager";
     image.decoding = "async";
     image.fetchPriority = "high";
-    revealImage(image, imageSkeleton);
-    image.src = `${WORKS_ASSETS_PATH}/${work.img_name}`;
+    void revealOriginalImage(image, imageSkeleton, `${WORKS_ASSETS_PATH}/${work.img_name}`);
 
     title.textContent = work.title;
     description.textContent = work.description;
