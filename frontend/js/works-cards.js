@@ -178,6 +178,120 @@ function revealImage(image, skeleton, fallbackSrc = null) {
     // Intentionally rely on load/error events to avoid premature reveal on slow progressive images.
 }
 
+function loadImageSource(image, source) {
+    return new Promise((resolve, reject) => {
+        const handleLoad = () => {
+            image.removeEventListener("load", handleLoad);
+            image.removeEventListener("error", handleError);
+            resolve(true);
+        };
+
+        const handleError = () => {
+            image.removeEventListener("load", handleLoad);
+            image.removeEventListener("error", handleError);
+            reject(new Error("image_load_error"));
+        };
+
+        image.addEventListener("load", handleLoad, { once: true });
+        image.addEventListener("error", handleError, { once: true });
+        image.src = source;
+
+        if (image.complete && image.naturalWidth > 0) {
+            image.removeEventListener("load", handleLoad);
+            image.removeEventListener("error", handleError);
+            resolve(true);
+        }
+    });
+}
+
+async function loadAndDecodeImage(image, source) {
+    await loadImageSource(image, source);
+
+    if (typeof image.decode === "function") {
+        try {
+            await image.decode();
+        } catch (error) {
+            // Ignore decode failures and keep the loaded bitmap flow.
+        }
+    }
+
+    return image.complete && image.naturalWidth > 0;
+}
+
+async function revealOriginalImage(image, skeleton, source, options = {}) {
+    if (!image || !skeleton || !source) {
+        return;
+    }
+
+    const { preload = true } = options;
+
+    try {
+        if (preload) {
+            const preloadImage = new Image();
+            preloadImage.decoding = "async";
+
+            const preloaded = await loadAndDecodeImage(preloadImage, source);
+
+            if (!preloaded) {
+                return;
+            }
+        }
+
+        await waitUntilConnected(image);
+
+        const loaded = await loadAndDecodeImage(image, source);
+
+        if (!loaded) {
+            return;
+        }
+
+        if (typeof window.requestAnimationFrame === "function") {
+            await new Promise((resolve) => {
+                window.requestAnimationFrame(() => {
+                    window.requestAnimationFrame(resolve);
+                });
+            });
+        }
+
+        image.classList.add("is-loaded");
+
+        const transitionMs = getTransitionDurationMs(image);
+
+        if (transitionMs <= 0) {
+            skeleton.classList.add("is-hidden");
+            return;
+        }
+
+        await new Promise((resolve) => {
+            let settled = false;
+
+            const finish = () => {
+                if (settled) {
+                    return;
+                }
+
+                settled = true;
+                image.removeEventListener("transitionend", handleTransitionEnd);
+                skeleton.classList.add("is-hidden");
+                resolve();
+            };
+
+            const handleTransitionEnd = (event) => {
+                if (event.propertyName && event.propertyName !== "opacity") {
+                    return;
+                }
+
+                finish();
+            };
+
+            image.addEventListener("transitionend", handleTransitionEnd);
+            window.setTimeout(finish, transitionMs + 80);
+        });
+    } catch (error) {
+        // Keep skeleton visible as a stable placeholder on failed load.
+    }
+}
+
 function getThumbPathFromImageName(imageName) {
     const dotIndex = imageName.lastIndexOf(".");
     const baseName = dotIndex === -1 ? imageName : imageName.slice(0, dotIndex);
