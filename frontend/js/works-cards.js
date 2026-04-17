@@ -14,17 +14,6 @@
  * @property {string} img_name
  */
 
-const IMAGE_PROBE_CANVAS = document.createElement("canvas");
-IMAGE_PROBE_CANVAS.width = 1;
-IMAGE_PROBE_CANVAS.height = 1;
-const IMAGE_PROBE_CONTEXT = IMAGE_PROBE_CANVAS.getContext("2d");
-
-function sleep(ms) {
-    return new Promise((resolve) => {
-        window.setTimeout(resolve, ms);
-    });
-}
-
 function getTransitionDurationMs(element) {
     const style = window.getComputedStyle(element);
     const durations = style.transitionDuration.split(",");
@@ -42,44 +31,17 @@ function getTransitionDurationMs(element) {
     }, 0);
 }
 
-function isImageDrawable(image) {
-    if (!IMAGE_PROBE_CONTEXT || !image.complete || image.naturalWidth <= 0 || image.naturalHeight <= 0) {
-        return false;
-    }
-
-    try {
-        IMAGE_PROBE_CONTEXT.clearRect(0, 0, 1, 1);
-        IMAGE_PROBE_CONTEXT.drawImage(image, 0, 0, 1, 1);
-        return true;
-    } catch (error) {
-        return false;
-    }
-}
-
-async function waitForImageReady(image, maxWaitMs = 12000) {
-    const startedAt = Date.now();
-
-    while (Date.now() - startedAt < maxWaitMs) {
-        if (isImageDrawable(image)) {
+async function waitForImageReady(image) {
+    if (typeof image.decode === "function") {
+        try {
+            await image.decode();
             return true;
+        } catch (error) {
+            return false;
         }
-
-        if (typeof image.decode === "function") {
-            try {
-                await image.decode();
-            } catch (error) {
-                // Ignore and keep waiting until image becomes drawable.
-            }
-        }
-
-        if (isImageDrawable(image)) {
-            return true;
-        }
-
-        await sleep(120);
     }
 
-    return isImageDrawable(image);
+    return image.complete && image.naturalWidth > 0;
 }
 
 function revealImage(image, skeleton, fallbackSrc = null) {
@@ -116,16 +78,15 @@ function revealImage(image, skeleton, fallbackSrc = null) {
 
         const isReady = await waitForImageReady(image);
 
+        if (!isReady) {
+            // Keep skeleton visible as a stable placeholder when decoding failed.
+            return;
+        }
+
         const reveal = () => {
             image.classList.add("is-loaded");
 
             const transitionMs = getTransitionDurationMs(image);
-
-            if (!isReady) {
-                // If readiness probe timed out, keep skeleton longer to avoid white gap.
-                window.setTimeout(hideSkeleton, Math.max(transitionMs + 120, 1600));
-                return;
-            }
 
             if (transitionMs <= 0) {
                 hideSkeleton();
