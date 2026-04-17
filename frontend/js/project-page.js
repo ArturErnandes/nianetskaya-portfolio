@@ -103,6 +103,14 @@ function createProjectMediaFigure(titleText, descriptionText, imageName, figureC
 
     image.alt = titleText || "Изображение проекта";
     image.decoding = "async";
+
+    if (titleText) {
+        image.loading = "eager";
+        image.fetchPriority = "high";
+    } else {
+        image.loading = "lazy";
+    }
+
     image.src = `${WORKS_ASSETS_PATH}/${imageName}`;
     revealImage(image, imageSkeleton);
 
@@ -135,6 +143,20 @@ function showMissingProjectState(projectCard, worksList) {
 
     projectCard.replaceChildren(title, description);
     worksList.replaceChildren();
+}
+
+function renderProjectLoadingState(projectCard) {
+    const figure = document.createElement("figure");
+    const media = document.createElement("div");
+    const imageSkeleton = document.createElement("div");
+
+    figure.className = "project-content";
+    media.className = "work-media";
+    imageSkeleton.className = "skeleton-image skeleton-block";
+
+    media.append(imageSkeleton);
+    figure.append(media);
+    projectCard.replaceChildren(figure);
 }
 
 function renderProject(projectCard, project) {
@@ -184,38 +206,53 @@ async function initProjectPage() {
         return;
     }
 
+    renderProjectLoadingState(projectCard);
     renderWorksLoadingState(worksList, 5);
 
+    /** @type {OpenedProject | null} */
+    let project = null;
+
     try {
-        /** @type {OpenedProject} */
-        const project = await fetchJson(
+        project = await fetchJson(
             `${API_ENDPOINTS.projects}/${projectId}`,
             "Ошибка ответа API",
         );
 
+        if (!project || typeof project !== "object") {
+            throw new Error("Некорректный формат данных проекта");
+        }
+    } catch (error) {
+        console.error("Ошибка при загрузке страницы проекта:", error);
+        showMissingProjectState(projectCard, worksList);
+        return;
+    }
+
+    const returnTo = getReturnPath(project.section_name);
+
+    backLink.href = returnTo || `/${project.section_name}`;
+    backLink.setAttribute(
+        "aria-label",
+        returnTo === "/" ? "Назад на главную" : "Назад к категории",
+    );
+
+    // Start loading full cover/gallery images immediately after project metadata is received.
+    renderProject(projectCard, project);
+
+    try {
         /** @type {Work[]} */
         const works = await fetchJson(
             `${API_ENDPOINTS.works}?section_name=${encodeURIComponent(project.section_name)}`,
             "Ошибка ответа API",
         );
 
-        if (!project || typeof project !== "object" || !Array.isArray(works)) {
-            throw new Error("Некорректный формат данных");
+        if (!Array.isArray(works)) {
+            throw new Error("Некорректный формат данных работ");
         }
 
-        const returnTo = getReturnPath(project.section_name);
-
-        backLink.href = returnTo || `/${project.section_name}`;
-        backLink.setAttribute(
-            "aria-label",
-            returnTo === "/" ? "Назад на главную" : "Назад к категории",
-        );
-
-        renderProject(projectCard, project);
         worksList.replaceChildren(...works.map(createWorkItem));
     } catch (error) {
-        console.error("Ошибка при загрузке страницы проекта:", error);
-        showMissingProjectState(projectCard, worksList);
+        console.error("Ошибка при загрузке списка похожих работ:", error);
+        worksList.replaceChildren();
     }
 }
 
