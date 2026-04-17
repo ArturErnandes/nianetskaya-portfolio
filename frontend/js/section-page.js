@@ -26,6 +26,7 @@ async function loadSectionWorks(sectionName) {
     }
 
     worksSection.dataset.sectionName = sectionName;
+    renderWorksLoadingState(worksList, 9);
 
     const worksRequestUrl = `${API_ENDPOINTS.works}?section_name=${encodeURIComponent(sectionName)}`;
     const projectsRequestUrl = `${API_ENDPOINTS.projects}?section_name=${encodeURIComponent(sectionName)}`;
@@ -37,12 +38,14 @@ async function loadSectionWorks(sectionName) {
         ]);
 
         if (!projectsResponse.ok) {
-            console.error(`Ошибка ответа API проектов: ${projectsResponse.status}`);
+            console.error("Ошибка ответа API проектов: " + projectsResponse.status);
+            worksList.replaceChildren();
             return;
         }
 
         if (!worksResponse.ok) {
-            console.error(`Ошибка ответа API работ: ${worksResponse.status}`);
+            console.error("Ошибка ответа API работ: " + worksResponse.status);
+            worksList.replaceChildren();
             return;
         }
 
@@ -53,11 +56,13 @@ async function loadSectionWorks(sectionName) {
 
         if (!Array.isArray(projects)) {
             console.error("Некорректный формат данных проектов");
+            worksList.replaceChildren();
             return;
         }
 
         if (!Array.isArray(works)) {
             console.error("Некорректный формат данных работ");
+            worksList.replaceChildren();
             return;
         }
 
@@ -67,6 +72,7 @@ async function loadSectionWorks(sectionName) {
         worksList.replaceChildren(...projectItems, ...workItems);
     } catch (error) {
         console.error("Ошибка при загрузке работ и проектов:", error);
+        worksList.replaceChildren();
     }
 }
 
