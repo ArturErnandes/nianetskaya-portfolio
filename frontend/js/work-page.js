@@ -90,6 +90,20 @@ function showMissingWorkState(workCard, worksList) {
     worksList.replaceChildren();
 }
 
+function renderWorkCardLoadingState(workCard) {
+    const figure = document.createElement("figure");
+    const media = document.createElement("div");
+    const imageSkeleton = document.createElement("div");
+
+    figure.className = "work-content";
+    media.className = "work-media";
+    imageSkeleton.className = "skeleton-image skeleton-block";
+
+    media.append(imageSkeleton);
+    figure.append(media);
+    workCard.replaceChildren(figure);
+}
+
 function renderWorkCard(workCard, work) {
     const figure = document.createElement("figure");
     const media = document.createElement("div");
@@ -105,7 +119,9 @@ function renderWorkCard(workCard, work) {
     imageSkeleton.className = "work-image-skeleton skeleton-block";
 
     image.alt = work.title;
+    image.loading = "eager";
     image.decoding = "async";
+    image.fetchPriority = "high";
     image.src = `${WORKS_ASSETS_PATH}/${work.img_name}`;
     revealImage(image, imageSkeleton);
 
@@ -136,42 +152,57 @@ async function initWorkPage() {
         return;
     }
 
+    renderWorkCardLoadingState(workCard);
     renderWorksLoadingState(worksList, 5);
 
+    /** @type {OpenedWork | null} */
+    let work = null;
+
     try {
-        /** @type {OpenedWork} */
-        const work = await fetchJson(
+        work = await fetchJson(
             `${API_ENDPOINTS.works}/${workId}`,
             "Ошибка ответа API",
         );
 
+        if (!work || typeof work !== "object") {
+            throw new Error("Некорректный формат данных работы");
+        }
+    } catch (error) {
+        console.error("Ошибка при загрузке страницы работы:", error);
+        showMissingWorkState(workCard, worksList);
+        return;
+    }
+
+    const returnTo = getReturnPath(work.section_name);
+
+    backLink.href = returnTo || `/${work.section_name}`;
+    backLink.setAttribute(
+        "aria-label",
+        returnTo === "/" ? "Назад на главную" : "Назад к категории",
+    );
+
+    // Start loading full image immediately after work metadata is received.
+    renderWorkCard(workCard, work);
+
+    try {
         /** @type {Work[]} */
         const works = await fetchJson(
             `${API_ENDPOINTS.works}?section_name=${encodeURIComponent(work.section_name)}`,
             "Ошибка ответа API",
         );
 
-        if (!work || typeof work !== "object" || !Array.isArray(works)) {
-            throw new Error("Некорректный формат данных");
+        if (!Array.isArray(works)) {
+            throw new Error("Некорректный формат данных работ");
         }
 
-        const returnTo = getReturnPath(work.section_name);
-
-        backLink.href = returnTo || `/${work.section_name}`;
-        backLink.setAttribute(
-            "aria-label",
-            returnTo === "/" ? "Назад на главную" : "Назад к категории",
-        );
-
-        renderWorkCard(workCard, work);
         worksList.replaceChildren(
             ...works
                 .filter((item) => item.id !== workId)
                 .map(createWorkItem),
         );
     } catch (error) {
-        console.error("Ошибка при загрузке страницы работы:", error);
-        showMissingWorkState(workCard, worksList);
+        console.error("Ошибка при загрузке списка похожих работ:", error);
+        worksList.replaceChildren();
     }
 }
 
