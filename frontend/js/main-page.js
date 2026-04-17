@@ -35,11 +35,14 @@ async function loadMainPageWorks() {
         return;
     }
 
+    renderWorksLoadingState(worksList, 6);
+
     try {
         const response = await fetch(API_ENDPOINTS.randomWorks);
 
         if (!response.ok) {
             console.error(`Ошибка ответа API: ${response.status}`);
+            worksList.replaceChildren();
             return;
         }
 
@@ -48,12 +51,14 @@ async function loadMainPageWorks() {
 
         if (!Array.isArray(works)) {
             console.error("Некорректный формат данных работ");
+            worksList.replaceChildren();
             return;
         }
 
         worksList.replaceChildren(...works.map(createWorkItem));
     } catch (error) {
         console.error("Ошибка при загрузке работ:", error);
+        worksList.replaceChildren();
     }
 }
 
