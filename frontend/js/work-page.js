@@ -136,6 +136,8 @@ async function initWorkPage() {
         return;
     }
 
+    renderWorksLoadingState(worksList, 5);
+
     try {
         /** @type {OpenedWork} */
         const work = await fetchJson(
