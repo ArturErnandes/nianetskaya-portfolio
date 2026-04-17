@@ -111,8 +111,8 @@ function createProjectMediaFigure(titleText, descriptionText, imageName, figureC
         image.loading = "lazy";
     }
 
-    image.src = `${WORKS_ASSETS_PATH}/${imageName}`;
     revealImage(image, imageSkeleton);
+    image.src = `${WORKS_ASSETS_PATH}/${imageName}`;
 
     media.append(image, imageSkeleton);
     figure.append(media);

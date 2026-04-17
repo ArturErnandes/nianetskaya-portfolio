@@ -44,6 +44,26 @@ async function waitForImageReady(image) {
     return image.complete && image.naturalWidth > 0;
 }
 
+async function waitForImageComplete(image, timeoutMs = 15000) {
+    if (image.complete) {
+        return true;
+    }
+
+    const startedAt = Date.now();
+
+    while (!image.complete) {
+        if (Date.now() - startedAt >= timeoutMs) {
+            return false;
+        }
+
+        await new Promise((resolve) => {
+            window.setTimeout(resolve, 50);
+        });
+    }
+
+    return true;
+}
+
 async function waitUntilConnected(element, maxFrames = 30) {
     if (element.isConnected || typeof window.requestAnimationFrame !== "function") {
         return;
@@ -69,6 +89,7 @@ async function waitUntilConnected(element, maxFrames = 30) {
 function revealImage(image, skeleton, fallbackSrc = null) {
     let imageRevealed = false;
     let loadHandled = false;
+    let skeletonHideTimerId = null;
 
     const hideSkeleton = () => {
         if (imageRevealed) {
@@ -77,15 +98,11 @@ function revealImage(image, skeleton, fallbackSrc = null) {
 
         imageRevealed = true;
         skeleton.classList.add("is-hidden");
-        image.removeEventListener("transitionend", handleTransitionEnd);
-    };
 
-    const handleTransitionEnd = (event) => {
-        if (event.propertyName && event.propertyName !== "opacity") {
-            return;
+        if (skeletonHideTimerId !== null) {
+            window.clearTimeout(skeletonHideTimerId);
+            skeletonHideTimerId = null;
         }
-
-        hideSkeleton();
     };
 
     const reveal = async () => {
@@ -98,7 +115,7 @@ function revealImage(image, skeleton, fallbackSrc = null) {
             return;
         }
 
-        image.addEventListener("transitionend", handleTransitionEnd, { once: true });
+        skeletonHideTimerId = window.setTimeout(hideSkeleton, transitionMs + 34);
     };
 
     const showImage = async () => {
@@ -110,6 +127,13 @@ function revealImage(image, skeleton, fallbackSrc = null) {
 
         image.removeEventListener("load", handleLoad);
         image.removeEventListener("error", handleError);
+
+        const isComplete = await waitForImageComplete(image);
+
+        if (!isComplete) {
+            // Keep skeleton visible if browser still has not completed image request.
+            return;
+        }
 
         const isReady = await waitForImageReady(image);
 
@@ -151,9 +175,7 @@ function revealImage(image, skeleton, fallbackSrc = null) {
     image.addEventListener("load", handleLoad, { once: true });
     image.addEventListener("error", handleError, { once: false });
 
-    if (image.complete && image.naturalWidth > 0) {
-        void showImage();
-    }
+    // Intentionally rely on load/error events to avoid premature reveal on slow progressive images.
 }
 
 function getThumbPathFromImageName(imageName) {
@@ -259,8 +281,8 @@ function createCardItem(entity, index, options = {}) {
     image.alt = entity.title;
     image.loading = "lazy";
     image.decoding = "async";
-    image.src = thumbSrc;
     revealImage(image, imageSkeleton, originalSrc);
+    image.src = thumbSrc;
 
     title.textContent = entity.title;
     caption.textContent = entity.caption;
