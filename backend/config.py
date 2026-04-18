@@ -1,7 +1,9 @@
 import json
 from pathlib import Path
 
-from .classes import AppConfig, DbConfig, AdminConfig
+from .settings.models import AdminConfig as AdminConfigModel
+from .settings.models import AppConfig as AppConfigModel
+from .settings.models import DbConfig as DbConfigModel
 
 CONFIG_FILE = Path(__file__).parent.parent / "data.json"
 
@@ -13,13 +15,13 @@ def load_config(filename: str | Path):
 
 config = load_config(CONFIG_FILE)
 
-AppConfig = AppConfig(
+AppConfig = AppConfigModel(
     host=config["app"]["host"],
     port=int(config["app"]["port"]),
 )
 
 
-DbConfig = DbConfig(
+DbConfig = DbConfigModel(
     admin=config["database"]["admin"],
     password=config["database"]["password"],
     host=config["database"]["host"],
@@ -28,6 +30,6 @@ DbConfig = DbConfig(
 )
 
 
-AdminConfig = AdminConfig(
+AdminConfig = AdminConfigModel(
     password_hash=config["admin"]["password_hash"],
 )
