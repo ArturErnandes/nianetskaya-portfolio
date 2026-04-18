@@ -4,6 +4,14 @@ function getSectionSlugFromPath() {
     return pathname || null;
 }
 
+function toSentenceCase(value) {
+    if (typeof value !== "string" || value.length === 0) {
+        return "";
+    }
+
+    return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
 function showMissingSectionState() {
     const heading = document.querySelector("[data-section-heading]");
     const worksList = document.querySelector(".works-list");
@@ -91,6 +99,7 @@ function initSectionPage() {
     }
 
     heading.textContent = section.heading;
+    document.title = toSentenceCase(section.heading);
     void loadSectionWorks(sectionSlug);
 }
 
