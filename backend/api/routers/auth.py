@@ -4,8 +4,8 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
 
 from ...auth import clear_admin_session_cookie, set_admin_session_cookie, verify_admin_password
-from ...classes import AdminAuthResponse, AdminLoginRequest
 from ...config import AdminConfig
+from ...schemas.auth import AdminAuthResponse, AdminLoginRequest
 
 router = APIRouter()
 
