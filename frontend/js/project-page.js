@@ -235,6 +235,7 @@ async function initProjectPage() {
         "aria-label",
         returnTo === "/" ? "Назад на главную" : "Назад к категории",
     );
+    document.title = project.title;
 
     // Start loading full cover/gallery images immediately after project metadata is received.
     renderProject(projectCard, project);
