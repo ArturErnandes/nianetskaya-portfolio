@@ -3,6 +3,23 @@
   <head>
       <meta charset="UTF-8">
       <title>Винецкая</title>
+      <script>
+          (function () {
+              const sectionTitles = {
+                  book_illustration: "Книжная иллюстрация",
+                  easel_graphics: "Станковая графика",
+                  graphic_design: "Графический дизайн",
+                  academic_works: "Академические работы",
+                  textile_design: "Дизайн текстиля",
+              };
+              const sectionSlug = window.location.pathname.replace(/^\/+|\/+$/g, "");
+              const sectionTitle = sectionTitles[sectionSlug];
+
+              if (sectionTitle) {
+                  document.title = sectionTitle;
+              }
+          }());
+      </script>
       <link rel="stylesheet" href="/frontend/css/section-page.css">
   </head>
   <body data-page="section">
