@@ -9,8 +9,8 @@ from typing import Optional
 
 from fastapi import Request, Response
 
-from .classes import AdminSessionData
 from .config import AdminConfig
+from .domain.models import AdminSessionData
 
 ADMIN_SESSION_COOKIE = "admin_session"
 ADMIN_SESSION_MAX_AGE = 60 * 60 * 12
