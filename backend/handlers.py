@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Optional
 from uuid import uuid4
 
 from fastapi import Form, HTTPException, Request, UploadFile
@@ -24,7 +25,7 @@ def serve_protected_admin_page(request: Request, file_name: str, fallback_headin
     return HTMLResponse(f"<h1>{fallback_heading}</h1>")
 
 
-def create_work_image_name(filename: str | None) -> str:
+def create_work_image_name(filename: Optional[str]) -> str:
     suffix = Path(filename or "").suffix.lower()
     safe_suffix = suffix if suffix in {".jpg", ".jpeg", ".png", ".webp"} else ".jpg"
     return f"{uuid4().hex}{safe_suffix}"
@@ -69,7 +70,7 @@ async def create_work_handler(data: WorkCreateSchema, image: UploadFile, works_a
 
     works_assets_dir.mkdir(parents=True, exist_ok=True)
     image_path = works_assets_dir / image_name
-    thumbnail_path: Path | None = None
+    thumbnail_path: Optional[Path] = None
 
     try:
         await write_upload_stream(image, image_path)
