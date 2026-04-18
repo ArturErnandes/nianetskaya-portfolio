@@ -1,5 +1,6 @@
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from typing import Optional
 
 from .config import DbConfig
 from .classes import (
@@ -7,7 +8,6 @@ from .classes import (
     OpenedProjectSchema,
     OpenedWorkSchema,
     ProjectCreateSchema,
-    ProjectImageCreateSchema,
     ProjectImageSchema,
     WorkCreateSchema,
 )
@@ -47,7 +47,7 @@ async def get_works_list_db(section_name: str) -> list[ClosedEntitySchema]:
 
 
 async def get_random_works_list_db() -> list[ClosedEntitySchema]:
-    query = text("SELECT work_id, title, caption, img_name FROM works ORDER BY RANDOM()")
+    query = text("SELECT work_id, title, caption, img_name FROM works ORDER BY RANDOM() LIMIT 20")
 
     try:
         async with new_session() as session:
@@ -94,7 +94,7 @@ async def get_work_db(work_id: int) -> OpenedWorkSchema:
         raise WorkLoadError from e
 
 
-async def get_projects_list_db(section_name: str | None) -> list[ClosedEntitySchema]:
+async def get_projects_list_db(section_name: Optional[str]) -> list[ClosedEntitySchema]:
     query = text(
         "SELECT project_id, title, caption, cover_img_name FROM projects "
         "WHERE section_name = COALESCE(:section_name, section_name) "
