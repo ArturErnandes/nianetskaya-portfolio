@@ -29,7 +29,7 @@ python main.py
 ## Документация
 
 - [docs/DATABASE.md](docs/DATABASE.md) — структура базы данных: таблицы, ключи, индексы и связи.
-- [docs/CONFIG.md](docs/CONFIG.md) — описание конфигурации проекта (`data.json`).
+- [docs/CONFIG.md](docs/CONFIG.md) — описание конфигурации проекта (`data.json`)
 
 ## Структура репозитория
 
