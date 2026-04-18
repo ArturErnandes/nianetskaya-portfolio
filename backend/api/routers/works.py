@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
 from fastapi.responses import JSONResponse
 
 from ...auth import has_admin_access
-from ...classes import WorkCreateSchema
 from ...db.repositories import get_random_works_list_db, get_work_db, get_works_list_db
 from ...exceptions import WorkCreateError, WorkLoadError, WorkNotFoundError
+from ...schemas.content import WorkCreateSchema
 from ...services.content import create_work_handler, get_work_create_data
 from ..router_constants import WORKS_ASSETS_DIR
 
