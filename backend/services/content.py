@@ -5,9 +5,9 @@ from fastapi import Form, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse
 
 from ..auth import has_admin_access
-from ..classes import ProjectCreateSchema, ProjectImageCreateSchema, WorkCreateSchema
 from ..db.repositories import create_project_db, create_work_db
 from ..exceptions import ProjectCreateError, WorkCreateError
+from ..schemas.content import ProjectCreateSchema, ProjectImageCreateSchema, WorkCreateSchema
 from .media import save_uploaded_image
 
 
