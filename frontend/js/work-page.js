@@ -179,6 +179,7 @@ async function initWorkPage() {
         "aria-label",
         returnTo === "/" ? "Назад на главную" : "Назад к категории",
     );
+    document.title = work.title;
 
     // Start loading full image immediately after work metadata is received.
     renderWorkCard(workCard, work);
