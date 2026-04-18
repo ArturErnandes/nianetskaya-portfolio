@@ -1,6 +1,6 @@
 from sqlalchemy import text
 
-from ..classes import (
+from ..schemas.content import (
     ClosedEntitySchema,
     OpenedProjectSchema,
     OpenedWorkSchema,
