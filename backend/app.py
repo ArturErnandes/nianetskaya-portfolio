@@ -78,7 +78,7 @@ async def get_work(work_id: int):
 
 
 @app.get("/api/projects", tags=["Projects"], summary="Получение списка проектов указанной категории")
-async def get_projects(section_name: str | None):
+async def get_projects(section_name: str):
     try:
         return await get_projects_list_db(section_name)
     except WorkLoadError:
