@@ -5,6 +5,7 @@ import json
 import time
 from dataclasses import asdict
 from secrets import compare_digest
+from typing import Optional
 
 from fastapi import Request, Response
 
@@ -56,7 +57,7 @@ def create_admin_session_cookie() -> str:
     return _build_signed_cookie_payload(session)
 
 
-def read_admin_session_cookie(cookie_value: str | None) -> AdminSessionData | None:
+def read_admin_session_cookie(cookie_value: Optional[str]) -> Optional[AdminSessionData]:
     if not cookie_value or "." not in cookie_value:
         return None
 
@@ -90,6 +91,7 @@ def set_admin_session_cookie(response: Response):
         max_age=ADMIN_SESSION_MAX_AGE,
         httponly=True,
         samesite="lax",
+        secure=True,
         path="/",
     )
 
@@ -99,6 +101,7 @@ def clear_admin_session_cookie(response: Response):
         key=ADMIN_SESSION_COOKIE,
         httponly=True,
         samesite="lax",
+        secure=True,
         path="/",
     )
 
