@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, Uplo
 from fastapi.responses import JSONResponse
 
 from ...auth import has_admin_access
-from ...classes import ProjectCreateSchema
 from ...db.repositories import get_project_db, get_projects_list_db
 from ...exceptions import ProjectCreateError, WorkLoadError, WorkNotFoundError
+from ...schemas.content import ProjectCreateSchema
 from ...services.content import create_project_handler, get_project_create_data
 from ..router_constants import WORKS_ASSETS_DIR
 
