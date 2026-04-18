@@ -10,6 +10,8 @@ from .database import create_project_db, create_work_db
 from .exceptions import ProjectCreateError, WorkCreateError
 from .image_tools import create_thumbnail
 
+UPLOAD_CHUNK_SIZE = 1024 * 1024
+
 
 def serve_protected_admin_page(request: Request, file_name: str, fallback_heading: str, frontend_html_dir: Path):
     if not has_admin_access(request):
@@ -42,22 +44,35 @@ def get_work_create_data(
     )
 
 
+async def write_upload_stream(upload: UploadFile, image_path: Path, chunk_size: int = UPLOAD_CHUNK_SIZE):
+    bytes_written = 0
+
+    with image_path.open("wb") as image_file:
+        while True:
+            chunk = await upload.read(chunk_size)
+            if not chunk:
+                break
+            image_file.write(chunk)
+            bytes_written += len(chunk)
+
+    if bytes_written == 0:
+        if image_path.exists():
+            image_path.unlink()
+        raise HTTPException(status_code=400, detail="image_required")
+
+
 async def create_work_handler(data: WorkCreateSchema, image: UploadFile, works_assets_dir: Path) -> int:
     if not image.filename:
         raise HTTPException(status_code=400, detail="image_required")
 
     image_name = create_work_image_name(image.filename)
-    image_bytes = await image.read()
-
-    if not image_bytes:
-        raise HTTPException(status_code=400, detail="image_required")
 
     works_assets_dir.mkdir(parents=True, exist_ok=True)
     image_path = works_assets_dir / image_name
     thumbnail_path: Path | None = None
 
     try:
-        image_path.write_bytes(image_bytes)
+        await write_upload_stream(image, image_path)
         thumbnail_path = create_thumbnail(image_path, works_assets_dir)
         persisted_work = WorkCreateSchema(
             section_name=data.section_name,
@@ -116,14 +131,10 @@ async def create_project_handler(
             raise HTTPException(status_code=400, detail="image_required")
 
         image_name = create_work_image_name(upload.filename)
-        image_bytes = await upload.read()
-
-        if not image_bytes:
-            raise HTTPException(status_code=400, detail="image_required")
 
         works_assets_dir.mkdir(parents=True, exist_ok=True)
         image_path = works_assets_dir / image_name
-        image_path.write_bytes(image_bytes)
+        await write_upload_stream(upload, image_path)
         saved_paths.append(image_path)
         saved_paths.append(create_thumbnail(image_path, works_assets_dir))
         return image_name
