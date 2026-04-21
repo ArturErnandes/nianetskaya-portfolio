@@ -11,60 +11,81 @@
       <a class="back-link" href="/admin/create-entity" aria-label="Назад к выбору сущности">&lt;</a>
       <h1>создать проект</h1>
     </header>
-    <main class="create-work-layout">
-      <section class="create-work-copy">
-        <h2>новый проект</h2>
-        <p class="create-work-description">
-          Заполните основную информацию о проекте, загрузите обложку и добавьте любое количество дополнительных изображений с описаниями.
-        </p>
-      </section>
-      <section class="create-work-panel">
-        <form class="create-work-form" data-create-project-form novalidate>
-          <label class="create-work-field">
+    <main class="editor-page">
+      <form class="editor-form" data-create-project-form novalidate>
+        <section class="editor-controls">
+          <label class="editor-control">
             <span>тематика</span>
-            <span class="create-work-select">
+            <span class="editor-select">
               <select name="section_name" data-section-select required></select>
             </span>
           </label>
-          <label class="create-work-field">
-            <span>название проекта</span>
-            <input name="title" type="text" required>
-          </label>
-          <label class="create-work-field">
-            <span>краткое описание</span>
-            <input name="caption" type="text" required>
-          </label>
-          <label class="create-work-field">
-            <span>подробное описание</span>
-            <textarea name="description" rows="7" required></textarea>
-          </label>
-          <label class="create-work-field">
-            <span>обложка проекта</span>
-            <input name="cover_image" type="file" accept="image/png,image/jpeg,image/webp" required>
-          </label>
-          <section class="project-gallery-builder">
-            <div class="project-gallery-builder-header">
-              <span>дополнительные изображения</span>
-              <button class="project-gallery-add" type="button" data-add-project-image>добавить изображение</button>
+        </section>
+
+        <section class="editor-preview">
+          <figure class="editor-work">
+            <div class="editor-media" data-file-dropzone>
+              <img data-project-cover-preview alt="Обложка проекта">
+              <label class="editor-upload-zone">
+                <input class="editor-file-input" name="cover_image" type="file" accept="image/png,image/jpeg,image/webp" required>
+                <span class="editor-upload-empty">
+                  <span class="editor-upload-icon" aria-hidden="true">↑</span>
+                  <span class="editor-upload-text">Выберите файл или<br>перетащите его сюда</span>
+                </span>
+                <span class="editor-upload-replace">изменить файл</span>
+              </label>
             </div>
-            <div class="project-gallery-list" data-project-gallery-list></div>
-          </section>
+            <figcaption class="editor-caption">
+              <label class="editor-field">
+                <span>2. название</span>
+                <input name="title" type="text" placeholder="Название проекта" required>
+              </label>
+              <label class="editor-field">
+                <span>3. краткое описание</span>
+                <textarea name="caption" rows="2" placeholder="Краткое описание для карточки" required></textarea>
+              </label>
+              <label class="editor-field">
+                <span>4. подробное описание</span>
+                <textarea name="description" rows="8" placeholder="Подробное описание проекта" required></textarea>
+              </label>
+            </figcaption>
+          </figure>
+        </section>
+
+        <section class="project-gallery-builder">
+          <div class="project-gallery-builder-header">
+            <span>дополнительные изображения проекта</span>
+            <button class="project-gallery-add" type="button" data-add-project-image>добавить изображение</button>
+          </div>
+          <div class="project-gallery-list" data-project-gallery-list></div>
+        </section>
+
+        <section class="editor-actions">
           <p class="create-work-status is-hidden" data-create-project-status aria-live="polite"></p>
           <button class="create-work-submit" type="submit">сохранить</button>
-        </form>
-      </section>
+        </section>
+      </form>
     </main>
     <template data-project-image-template>
-      <article class="project-gallery-item-form">
-        <label class="create-work-field">
-          <span>изображение</span>
-          <input name="gallery_images" type="file" accept="image/png,image/jpeg,image/webp" required>
-        </label>
-        <label class="create-work-field">
-          <span>описание изображения</span>
-          <textarea name="gallery_descriptions" rows="4"></textarea>
-        </label>
-        <button class="project-gallery-remove" type="button">удалить</button>
+      <article class="project-gallery-item-form editor-preview">
+        <div class="editor-media" data-file-dropzone>
+          <img data-gallery-image-preview alt="Превью изображения галереи">
+          <label class="editor-upload-zone">
+            <input class="editor-file-input" name="gallery_images" type="file" accept="image/png,image/jpeg,image/webp" required>
+            <span class="editor-upload-empty">
+              <span class="editor-upload-icon" aria-hidden="true">↑</span>
+              <span class="editor-upload-text">Выберите файл или<br>перетащите его сюда</span>
+            </span>
+            <span class="editor-upload-replace">изменить файл</span>
+          </label>
+        </div>
+        <div class="editor-caption project-gallery-caption">
+          <label class="editor-field">
+            <span>описание изображения</span>
+            <textarea name="gallery_descriptions" rows="6"></textarea>
+          </label>
+          <button class="project-gallery-remove" type="button">удалить изображение</button>
+        </div>
       </article>
     </template>
     <script src="/frontend/js/config.js"></script>
