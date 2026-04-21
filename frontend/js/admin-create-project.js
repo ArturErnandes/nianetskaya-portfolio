@@ -10,6 +10,126 @@ function setCreateProjectStatus(message, isSuccess = false) {
     statusElement.classList.toggle("is-success", Boolean(message) && isSuccess);
 }
 
+let projectCoverObjectUrl = null;
+const projectGalleryPreviewUrls = new Map();
+
+function revokeProjectCoverUrl() {
+    if (!projectCoverObjectUrl) {
+        return;
+    }
+
+    URL.revokeObjectURL(projectCoverObjectUrl);
+    projectCoverObjectUrl = null;
+}
+
+function revokeGalleryPreviewForInput(input) {
+    const existingUrl = projectGalleryPreviewUrls.get(input);
+
+    if (!existingUrl) {
+        return;
+    }
+
+    URL.revokeObjectURL(existingUrl);
+    projectGalleryPreviewUrls.delete(input);
+}
+
+function revokeAllGalleryPreviewUrls() {
+    projectGalleryPreviewUrls.forEach((url) => {
+        URL.revokeObjectURL(url);
+    });
+    projectGalleryPreviewUrls.clear();
+}
+
+function getFirstImageFile(fileList) {
+    if (!(fileList instanceof FileList)) {
+        return null;
+    }
+
+    for (const file of fileList) {
+        if (file instanceof File && file.type.startsWith("image/")) {
+            return file;
+        }
+    }
+
+    return null;
+}
+
+function assignFileToInput(input, file) {
+    const transfer = new DataTransfer();
+    transfer.items.add(file);
+    input.files = transfer.files;
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+}
+
+function updateProjectCoverPreview(form) {
+    const image = document.querySelector("[data-project-cover-preview]");
+
+    if (!(image instanceof HTMLImageElement)) {
+        return;
+    }
+
+    const media = image.closest(".editor-media");
+
+    if (!(media instanceof HTMLElement)) {
+        return;
+    }
+
+    revokeProjectCoverUrl();
+
+    const coverInput = form.elements.namedItem("cover_image");
+    const file = coverInput instanceof HTMLInputElement && coverInput.files ? coverInput.files[0] : null;
+
+    if (file instanceof File && file.size > 0) {
+        projectCoverObjectUrl = URL.createObjectURL(file);
+        image.src = projectCoverObjectUrl;
+        image.classList.add("is-visible");
+        media.classList.add("is-has-image");
+        return;
+    }
+
+    image.removeAttribute("src");
+    image.classList.remove("is-visible");
+    media.classList.remove("is-has-image");
+}
+
+function updateGalleryImagePreview(input) {
+    const item = input.closest(".project-gallery-item-form");
+
+    if (!(item instanceof HTMLElement)) {
+        return;
+    }
+
+    const image = item.querySelector("[data-gallery-image-preview]");
+
+    if (!(image instanceof HTMLImageElement)) {
+        return;
+    }
+
+    const media = image.closest(".editor-media");
+
+    if (!(media instanceof HTMLElement)) {
+        return;
+    }
+
+    revokeGalleryPreviewForInput(input);
+
+    const file = input.files ? input.files[0] : null;
+
+    if (file instanceof File && file.size > 0) {
+        const objectUrl = URL.createObjectURL(file);
+        projectGalleryPreviewUrls.set(input, objectUrl);
+
+        image.src = objectUrl;
+        image.classList.add("is-visible");
+        media.classList.add("is-has-image");
+        return;
+    }
+
+    image.removeAttribute("src");
+    image.classList.remove("is-visible");
+    media.classList.remove("is-has-image");
+}
+
 function populateSections() {
     const sectionSelect = document.querySelector("[data-section-select]");
 
@@ -36,16 +156,23 @@ function addProjectImageForm() {
     }
 
     const fragment = template.content.cloneNode(true);
-    const item = fragment.querySelector(".project-gallery-item-form");
-    const removeButton = fragment.querySelector(".project-gallery-remove");
+    list.append(fragment);
+}
 
-    if (item instanceof HTMLElement && removeButton instanceof HTMLButtonElement) {
-        removeButton.addEventListener("click", () => {
-            item.remove();
-        });
+function removeProjectImageForm(button) {
+    const item = button.closest(".project-gallery-item-form");
+
+    if (!(item instanceof HTMLElement)) {
+        return;
     }
 
-    list.append(fragment);
+    const imageInput = item.querySelector('input[name="gallery_images"]');
+
+    if (imageInput instanceof HTMLInputElement) {
+        revokeGalleryPreviewForInput(imageInput);
+    }
+
+    item.remove();
 }
 
 async function handleCreateProjectSubmit(event) {
@@ -85,12 +212,18 @@ async function handleCreateProjectSubmit(event) {
             return;
         }
 
+        const galleryList = document.querySelector("[data-project-gallery-list]");
+
         form.reset();
         populateSections();
-        const list = document.querySelector("[data-project-gallery-list]");
-        if (list instanceof HTMLElement) {
-            list.replaceChildren();
+        revokeProjectCoverUrl();
+        revokeAllGalleryPreviewUrls();
+
+        if (galleryList instanceof HTMLElement) {
+            galleryList.replaceChildren();
         }
+
+        updateProjectCoverPreview(form);
         setCreateProjectStatus("Проект успешно сохранен", true);
     } catch (error) {
         console.error("Ошибка при создании проекта:", error);
@@ -100,6 +233,85 @@ async function handleCreateProjectSubmit(event) {
     }
 }
 
+function initProjectDropzones(form, galleryList) {
+    form.addEventListener("dragover", (event) => {
+        const target = event.target;
+
+        if (!(target instanceof HTMLElement)) {
+            return;
+        }
+
+        const dropzone = target.closest("[data-file-dropzone]");
+
+        if (!(dropzone instanceof HTMLElement)) {
+            return;
+        }
+
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "copy";
+        dropzone.classList.add("is-dragover");
+    });
+
+    form.addEventListener("dragleave", (event) => {
+        const target = event.target;
+
+        if (!(target instanceof HTMLElement)) {
+            return;
+        }
+
+        const dropzone = target.closest("[data-file-dropzone]");
+
+        if (dropzone instanceof HTMLElement) {
+            dropzone.classList.remove("is-dragover");
+        }
+    });
+
+    form.addEventListener("drop", (event) => {
+        const target = event.target;
+
+        if (!(target instanceof HTMLElement)) {
+            return;
+        }
+
+        const dropzone = target.closest("[data-file-dropzone]");
+
+        if (!(dropzone instanceof HTMLElement) || !event.dataTransfer) {
+            return;
+        }
+
+        event.preventDefault();
+        dropzone.classList.remove("is-dragover");
+
+        const input = dropzone.querySelector('input[type="file"]');
+
+        if (!(input instanceof HTMLInputElement)) {
+            return;
+        }
+
+        const droppedFile = getFirstImageFile(event.dataTransfer.files);
+
+        if (!(droppedFile instanceof File)) {
+            return;
+        }
+
+        assignFileToInput(input, droppedFile);
+    });
+
+    galleryList.addEventListener("click", (event) => {
+        const target = event.target;
+
+        if (!(target instanceof HTMLElement)) {
+            return;
+        }
+
+        const removeButton = target.closest(".project-gallery-remove");
+
+        if (removeButton instanceof HTMLButtonElement) {
+            removeProjectImageForm(removeButton);
+        }
+    });
+}
+
 function initAdminCreateProjectPage() {
     if (document.body.dataset.page !== "admin-create-project") {
         return;
@@ -107,14 +319,46 @@ function initAdminCreateProjectPage() {
 
     const form = document.querySelector("[data-create-project-form]");
     const addButton = document.querySelector("[data-add-project-image]");
+    const galleryList = document.querySelector("[data-project-gallery-list]");
 
-    if (!(form instanceof HTMLFormElement) || !(addButton instanceof HTMLButtonElement)) {
+    if (
+        !(form instanceof HTMLFormElement) ||
+        !(addButton instanceof HTMLButtonElement) ||
+        !(galleryList instanceof HTMLElement)
+    ) {
         return;
     }
 
     populateSections();
     setCreateProjectStatus("");
+    updateProjectCoverPreview(form);
+
     addButton.addEventListener("click", addProjectImageForm);
+
+    form.addEventListener("change", (event) => {
+        const target = event.target;
+
+        if (!(target instanceof HTMLElement)) {
+            return;
+        }
+
+        if (target instanceof HTMLInputElement && target.name === "cover_image") {
+            updateProjectCoverPreview(form);
+            return;
+        }
+
+        if (target instanceof HTMLInputElement && target.name === "gallery_images") {
+            updateGalleryImagePreview(target);
+        }
+    });
+
+    initProjectDropzones(form, galleryList);
+
+    window.addEventListener("beforeunload", () => {
+        revokeProjectCoverUrl();
+        revokeAllGalleryPreviewUrls();
+    });
+
     form.addEventListener("submit", handleCreateProjectSubmit);
 }
 
