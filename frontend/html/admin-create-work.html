@@ -10,41 +10,52 @@
       <a class="back-link" href="/admin/create-entity" aria-label="Назад к выбору сущности">&lt;</a>
       <h1>создать работу</h1>
     </header>
-    <main class="create-work-layout">
-      <section class="create-work-copy">
-        <h2>новая работа</h2>
-        <p class="create-work-description">
-          Заполните данные работы и загрузите изображение. После сохранения работа появится в выбранной категории
-        </p>
-      </section>
-      <section class="create-work-panel">
-        <form class="create-work-form" data-create-work-form novalidate>
-          <label class="create-work-field">
+    <main class="editor-page">
+      <form class="editor-form" data-create-work-form novalidate>
+        <section class="editor-controls">
+          <label class="editor-control">
             <span>тематика</span>
-            <span class="create-work-select">
+            <span class="editor-select">
               <select name="section_name" data-section-select required></select>
             </span>
           </label>
-          <label class="create-work-field">
-            <span>название работы</span>
-            <input name="title" type="text" required>
-          </label>
-          <label class="create-work-field">
-            <span>краткое описание</span>
-            <input name="caption" type="text" required>
-          </label>
-          <label class="create-work-field">
-            <span>подробное описание</span>
-            <textarea name="description" rows="7" required></textarea>
-          </label>
-          <label class="create-work-field">
-            <span>изображение</span>
-            <input name="image" type="file" accept="image/png,image/jpeg,image/webp" required>
-          </label>
+        </section>
+
+        <section class="editor-preview">
+          <figure class="editor-work">
+            <div class="editor-media" data-file-dropzone>
+              <img data-work-image-preview alt="Изображение работы">
+              <label class="editor-upload-zone" data-work-upload-zone>
+                <input class="editor-file-input" name="image" type="file" accept="image/png,image/jpeg,image/webp" required>
+                <span class="editor-upload-empty">
+                  <span class="editor-upload-icon" aria-hidden="true">↑</span>
+                  <span class="editor-upload-text">Выберите файл или<br>перетащите его сюда</span>
+                </span>
+                <span class="editor-upload-replace">изменить файл</span>
+              </label>
+            </div>
+            <figcaption class="editor-caption">
+              <label class="editor-field">
+                <span>2. название</span>
+                <input name="title" type="text" placeholder="Название работы" required>
+              </label>
+              <label class="editor-field">
+                <span>3. краткое описание</span>
+                <textarea name="caption" rows="2" placeholder="Краткое описание для карточки" required></textarea>
+              </label>
+              <label class="editor-field">
+                <span>4. подробное описание</span>
+                <textarea name="description" rows="8" placeholder="Подробное описание работы" required></textarea>
+              </label>
+            </figcaption>
+          </figure>
+        </section>
+
+        <section class="editor-actions">
           <p class="create-work-status is-hidden" data-create-work-status aria-live="polite"></p>
           <button class="create-work-submit" type="submit">сохранить</button>
-        </form>
-      </section>
+        </section>
+      </form>
     </main>
     <script src="/frontend/js/config.js"></script>
     <script src="/frontend/js/admin-create-work.js"></script>
