@@ -1,6 +1,9 @@
 .project-gallery-builder {
     display: grid;
-    gap: 16px;
+    gap: 14px;
+    padding: 16px;
+    border: 1px solid #ddd;
+    background: #fafafa;
 }
 
 .project-gallery-builder-header {
@@ -19,8 +22,9 @@
 .project-gallery-add,
 .project-gallery-remove {
     width: fit-content;
-    min-width: 140px;
-    padding: 8px 18px;
+    min-width: 180px;
+    height: 40px;
+    padding: 0 18px;
     border: 1px solid #cfcfcf;
     background: #fff;
     color: #5a5a5a;
@@ -32,17 +36,27 @@
 
 .project-gallery-list {
     display: grid;
-    gap: 16px;
+    gap: 18px;
 }
 
 .project-gallery-item-form {
     display: grid;
     gap: 14px;
-    padding: 18px 16px;
-    border: 1px solid #ddd;
 }
 
-@media (max-width: 640px) {
+.project-gallery-caption {
+    width: 100%;
+}
+
+.project-gallery-caption .editor-field textarea {
+    min-height: 160px;
+}
+
+.project-gallery-remove {
+    justify-self: start;
+}
+
+@media (max-width: 760px) {
     .project-gallery-builder-header {
         align-items: stretch;
         flex-direction: column;
