@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+      <meta charset="UTF-8">
+      <title>Винецкая</title>
+      <link rel="stylesheet" href="/frontend/css/admin-manage.css">
+  </head>
+  <body data-page="admin-manage">
+    <header class="admin-header">
+      <a class="back-link" href="/admin/create-entity" aria-label="Назад к выбору сущности">&lt;</a>
+      <h1>редактировать работы</h1>
+    </header>
+    <main class="manage-page">
+      <section class="manage-controls">
+        <label class="manage-control">
+          <span>тематика</span>
+          <span class="manage-select">
+            <select name="section_name" data-section-select required></select>
+          </span>
+        </label>
+        <p class="manage-status is-hidden" data-manage-status aria-live="polite"></p>
+      </section>
+      <section class="manage-list-section">
+        <ul class="manage-list" data-works-list></ul>
+      </section>
+    </main>
+    <script src="/frontend/js/config.js"></script>
+    <script src="/frontend/js/admin-manage.js"></script>
+  </body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+      <meta charset="UTF-8">
+      <title>Винецкая</title>
+      <link rel="stylesheet" href="/frontend/css/admin-create-work.css">
+  </head>
+  <body data-page="admin-edit-work">
+    <header class="admin-header">
+      <a class="back-link" href="/admin/manage" aria-label="Назад к списку работ">&lt;</a>
+      <h1>редактировать работу</h1>
+    </header>
+    <main class="editor-page">
+      <form class="editor-form" data-edit-work-form novalidate>
+        <section class="editor-controls">
+          <label class="editor-control">
+            <span>тематика</span>
+            <span class="editor-select">
+              <select name="section_name" data-section-select required></select>
+            </span>
+          </label>
+        </section>
+
+        <section class="editor-preview">
+          <figure class="editor-work">
+            <div class="editor-media" data-file-dropzone>
+              <img data-work-image-preview alt="Изображение работы">
+              <label class="editor-upload-zone" data-work-upload-zone>
+                <input class="editor-file-input" name="image" type="file" accept="image/png,image/jpeg,image/webp">
+                <span class="editor-upload-empty">
+                  <span class="editor-upload-icon" aria-hidden="true">↑</span>
+                  <span class="editor-upload-text">Выберите файл или<br>перетащите его сюда</span>
+                </span>
+                <span class="editor-upload-replace">изменить файл</span>
+              </label>
+            </div>
+            <figcaption class="editor-caption">
+              <label class="editor-field">
+                <span>название</span>
+                <input name="title" type="text" placeholder="Название работы" required>
+              </label>
+              <label class="editor-field">
+                <span>краткое описание</span>
+                <textarea name="caption" rows="2" placeholder="Краткое описание для карточки" required></textarea>
+              </label>
+              <label class="editor-field">
+                <span>подробное описание</span>
+                <textarea name="description" rows="8" placeholder="Подробное описание работы" required></textarea>
+              </label>
+            </figcaption>
+          </figure>
+        </section>
+
+        <section class="editor-actions">
+          <p class="create-work-status is-hidden" data-edit-work-status aria-live="polite"></p>
+          <button class="create-work-submit" type="submit">сохранить изменения</button>
+        </section>
+      </form>
+    </main>
+    <script src="/frontend/js/config.js"></script>
+    <script src="/frontend/js/admin-edit-work.js"></script>
+  </body>
+</html>

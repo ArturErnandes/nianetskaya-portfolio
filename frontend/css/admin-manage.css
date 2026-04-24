@@ -1,0 +1,251 @@
+body {
+    margin: 0;
+    padding: 40px 32px 48px;
+    min-height: 100vh;
+    background: #fff;
+    color: #1f1f1f;
+    font-family: Inter, sans-serif;
+    box-sizing: border-box;
+}
+
+*, *::before, *::after { box-sizing: inherit; }
+
+.admin-header,
+.manage-page {
+    max-width: 1320px;
+    margin: 0 auto;
+}
+
+.admin-header {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 48px;
+    margin-bottom: 28px;
+}
+
+.back-link {
+    position: absolute;
+    left: 0;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 32px;
+    height: 32px;
+    color: #5a5a5a;
+    font-size: 42px;
+    line-height: 1;
+    text-decoration: none;
+}
+
+h1,
+.manage-control select,
+.manage-card h2,
+.manage-card-action {
+    font: inherit;
+}
+
+h1 {
+    margin: 0;
+    font-size: 35px;
+    font-weight: 400;
+    line-height: 1.2;
+}
+
+.manage-page {
+    display: grid;
+    gap: 22px;
+}
+
+.manage-controls {
+    display: grid;
+    grid-template-columns: minmax(240px, 420px) 1fr;
+    gap: 14px;
+    align-items: end;
+    padding: 14px;
+    border: 1px solid #ddd;
+    background: #fafafa;
+}
+
+.manage-control {
+    display: grid;
+    gap: 8px;
+}
+
+.manage-control > span,
+.manage-status {
+    font-size: 13px;
+    line-height: 1.2;
+}
+
+.manage-control > span {
+    color: #7f7f7f;
+}
+
+.manage-control select {
+    width: 100%;
+    height: 48px;
+    border: 1px solid #cfcfcf;
+    padding: 12px 44px 12px 14px;
+    background: #fff;
+    color: #1f1f1f;
+    font-size: 16px;
+    outline: none;
+    appearance: none;
+}
+
+.manage-control select:focus {
+    border-color: #5a5a5a;
+}
+
+.manage-select {
+    position: relative;
+    display: block;
+}
+
+.manage-select::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 18px;
+    width: 9px;
+    height: 9px;
+    border-right: 1.5px solid #5a5a5a;
+    border-bottom: 1.5px solid #5a5a5a;
+    transform: translateY(-62%) rotate(45deg);
+    pointer-events: none;
+}
+
+.manage-status {
+    min-height: 16px;
+    margin: 0;
+    color: #8d2d2d;
+}
+
+.manage-status.is-success { color: #35613a; }
+.manage-status.is-hidden { visibility: hidden; }
+
+.manage-list-section {
+    border: 1px solid #ddd;
+    padding: 18px;
+}
+
+.manage-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.manage-card {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    min-width: 0;
+    border: 1px solid #ddd;
+    background: #fff;
+}
+
+.manage-card-media {
+    position: relative;
+    aspect-ratio: 1.62 / 1;
+    background: #f2f2f2;
+    overflow: hidden;
+}
+
+.manage-card-media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.manage-card-body {
+    display: grid;
+    gap: 10px;
+    padding: 14px;
+}
+
+.manage-card h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 1.15;
+}
+
+.manage-card p {
+    margin: 0;
+    color: #5a5a5a;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.manage-card-action {
+    width: fit-content;
+    margin-top: 4px;
+    padding: 9px 22px;
+    background: #5a5a5a;
+    color: #fff;
+    font-size: 14px;
+    line-height: 1.2;
+    text-decoration: none;
+}
+
+.manage-empty-item {
+    grid-column: 1 / -1;
+}
+
+.manage-empty {
+    margin: 0;
+    padding: 36px 0;
+    color: #7f7f7f;
+    font-size: 16px;
+    line-height: 1.4;
+    text-align: center;
+}
+
+@media (max-width: 980px) {
+    .manage-controls,
+    .manage-list {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    body { padding: 22px 16px 28px; }
+
+    .admin-header {
+        justify-content: flex-start;
+        min-height: auto;
+        margin-bottom: 22px;
+        padding-left: 34px;
+    }
+
+    .back-link {
+        width: 24px;
+        height: 24px;
+        font-size: 34px;
+    }
+
+    h1 { font-size: 20px; }
+
+    .manage-controls,
+    .manage-list {
+        grid-template-columns: 1fr;
+    }
+
+    .manage-list-section {
+        padding: 12px;
+    }
+
+    .manage-card h2 {
+        font-size: 20px;
+    }
+
+    .manage-card-action {
+        width: 100%;
+        text-align: center;
+    }
+}
