@@ -33,7 +33,7 @@ function populateSections() {
     sectionSelect.replaceChildren(...options);
 }
 
-function createWorkManageItem(work) {
+function createManageItem(entity, editHref, isProject = false) {
     const item = document.createElement("li");
     const article = document.createElement("article");
     const media = document.createElement("div");
@@ -45,12 +45,13 @@ function createWorkManageItem(work) {
 
     item.className = "manage-item";
     article.className = "manage-card";
+    article.classList.toggle("is-project", isProject);
     media.className = "manage-card-media";
     body.className = "manage-card-body";
     link.className = "manage-card-action";
 
-    image.src = getThumbPathFromImageName(work.img_name);
-    image.alt = work.title;
+    image.src = getThumbPathFromImageName(entity.img_name);
+    image.alt = entity.title;
     image.loading = "lazy";
     image.decoding = "async";
     image.addEventListener("error", () => {
@@ -59,12 +60,12 @@ function createWorkManageItem(work) {
         }
 
         image.dataset.fallbackApplied = "1";
-        image.src = `${WORKS_ASSETS_PATH}/${work.img_name}`;
+        image.src = `${WORKS_ASSETS_PATH}/${entity.img_name}`;
     });
 
-    title.textContent = work.title;
-    caption.textContent = work.caption;
-    link.href = `/admin/edit-work/${work.id}`;
+    title.textContent = entity.title;
+    caption.textContent = entity.caption;
+    link.href = editHref;
     link.textContent = "редактировать";
 
     media.append(image);
@@ -75,7 +76,15 @@ function createWorkManageItem(work) {
     return item;
 }
 
-function renderEmptyState(worksList, message) {
+function createWorkManageItem(work) {
+    return createManageItem(work, `/admin/edit-work/${work.id}`);
+}
+
+function createProjectManageItem(project) {
+    return createManageItem(project, `/admin/edit-project/${project.id}`, true);
+}
+
+function renderEmptyState(listElement, message) {
     const item = document.createElement("li");
     const emptyState = document.createElement("p");
 
@@ -83,53 +92,61 @@ function renderEmptyState(worksList, message) {
     emptyState.className = "manage-empty";
     emptyState.textContent = message;
     item.append(emptyState);
-    worksList.replaceChildren(item);
+    listElement.replaceChildren(item);
 }
 
-async function loadManageWorks(sectionName) {
-    const worksList = document.querySelector("[data-works-list]");
+async function loadManageEntityList(sectionName, endpoint, listSelector, createItem, emptyMessage) {
+    const listElement = document.querySelector(listSelector);
 
-    if (!(worksList instanceof HTMLElement) || !sectionName) {
-        return;
+    if (!(listElement instanceof HTMLElement) || !sectionName) {
+        return false;
     }
 
-    setManageStatus("Загрузка работ...");
+    setManageStatus("Загрузка...");
 
     try {
-        const response = await fetch(`${API_ENDPOINTS.works}?section_name=${encodeURIComponent(sectionName)}`);
+        const response = await fetch(`${endpoint}?section_name=${encodeURIComponent(sectionName)}`);
 
         if (response.status === 401) {
             window.location.assign("/admin/login");
-            return;
+            return false;
         }
 
         if (!response.ok) {
-            setManageStatus("Не удалось загрузить работы");
-            renderEmptyState(worksList, "Работы не загружены");
-            return;
+            renderEmptyState(listElement, "Не удалось загрузить список");
+            return false;
         }
 
-        const works = await response.json();
+        const entities = await response.json();
 
-        if (!Array.isArray(works)) {
-            setManageStatus("Некорректный ответ сервера");
-            renderEmptyState(worksList, "Работы не загружены");
-            return;
+        if (!Array.isArray(entities)) {
+            renderEmptyState(listElement, "Некорректный ответ сервера");
+            return false;
         }
 
-        if (works.length === 0) {
-            setManageStatus("Работы в выбранной тематике не найдены", true);
-            renderEmptyState(worksList, "В этой тематике пока нет работ");
-            return;
+        if (entities.length === 0) {
+            renderEmptyState(listElement, emptyMessage);
+            return true;
         }
 
-        worksList.replaceChildren(...works.map(createWorkManageItem));
-        setManageStatus(`Найдено работ: ${works.length}`, true);
+        listElement.replaceChildren(...entities.map(createItem));
+        return true;
     } catch (error) {
-        console.error("Ошибка при загрузке работ для редактирования:", error);
-        setManageStatus("Ошибка сети. Попробуйте еще раз");
-        renderEmptyState(worksList, "Работы не загружены");
+        console.error("Ошибка при загрузке списка для редактирования:", error);
+        renderEmptyState(listElement, "Ошибка сети. Попробуйте еще раз");
+        return false;
     }
+}
+
+async function loadManageEntities(sectionName) {
+    setManageStatus("Загрузка...");
+
+    const results = await Promise.all([
+        loadManageEntityList(sectionName, API_ENDPOINTS.projects, "[data-projects-list]", createProjectManageItem, "В этой тематике пока нет проектов"),
+        loadManageEntityList(sectionName, API_ENDPOINTS.works, "[data-works-list]", createWorkManageItem, "В этой тематике пока нет работ"),
+    ]);
+
+    setManageStatus(results.every(Boolean) ? "Список загружен" : "Список загружен не полностью", results.every(Boolean));
 }
 
 function initAdminManagePage() {
@@ -144,10 +161,10 @@ function initAdminManagePage() {
     }
 
     populateSections();
-    void loadManageWorks(sectionSelect.value);
+    void loadManageEntities(sectionSelect.value);
 
     sectionSelect.addEventListener("change", () => {
-        void loadManageWorks(sectionSelect.value);
+        void loadManageEntities(sectionSelect.value);
     });
 }
 
