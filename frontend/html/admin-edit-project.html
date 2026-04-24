@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+      <meta charset="UTF-8">
+      <title>Винецкая</title>
+      <link rel="stylesheet" href="/frontend/css/admin-create-work.css">
+      <link rel="stylesheet" href="/frontend/css/admin-create-project.css">
+  </head>
+  <body data-page="admin-edit-project">
+    <header class="admin-header">
+      <a class="back-link" href="/admin/manage" aria-label="Назад к списку">&lt;</a>
+      <h1>редактировать проект</h1>
+    </header>
+    <main class="editor-page">
+      <form class="editor-form" data-edit-project-form novalidate>
+        <section class="editor-controls">
+          <label class="editor-control">
+            <span>тематика</span>
+            <span class="editor-select">
+              <select name="section_name" data-section-select required></select>
+            </span>
+          </label>
+        </section>
+
+        <section class="editor-preview">
+          <figure class="editor-work">
+            <div class="editor-media" data-file-dropzone>
+              <img data-project-cover-preview alt="Обложка проекта">
+              <label class="editor-upload-zone">
+                <input class="editor-file-input" name="cover_image" type="file" accept="image/png,image/jpeg,image/webp">
+                <span class="editor-upload-empty">
+                  <span class="editor-upload-icon" aria-hidden="true">↑</span>
+                  <span class="editor-upload-text">Выберите файл или<br>перетащите его сюда</span>
+                </span>
+                <span class="editor-upload-replace">изменить файл</span>
+              </label>
+            </div>
+            <figcaption class="editor-caption">
+              <label class="editor-field">
+                <span>название</span>
+                <input name="title" type="text" placeholder="Название проекта" required>
+              </label>
+              <label class="editor-field">
+                <span>краткое описание</span>
+                <textarea name="caption" rows="2" placeholder="Краткое описание для карточки" required></textarea>
+              </label>
+              <label class="editor-field">
+                <span>подробное описание</span>
+                <textarea name="description" rows="8" placeholder="Подробное описание проекта" required></textarea>
+              </label>
+            </figcaption>
+          </figure>
+        </section>
+
+        <section class="project-gallery-builder">
+          <div class="project-gallery-builder-header">
+            <span>дополнительные изображения проекта</span>
+            <button class="project-gallery-add" type="button" data-add-project-image>добавить изображение</button>
+          </div>
+          <div class="project-gallery-list" data-project-gallery-list></div>
+        </section>
+
+        <section class="editor-actions">
+          <p class="create-work-status is-hidden" data-edit-project-status aria-live="polite"></p>
+          <button class="create-work-submit" type="submit">сохранить изменения</button>
+        </section>
+      </form>
+    </main>
+
+    <template data-project-existing-image-template>
+      <article class="project-gallery-item-form editor-preview" data-project-image-item>
+        <div class="editor-media">
+          <img data-gallery-image-preview alt="Изображение проекта">
+        </div>
+        <div class="editor-caption project-gallery-caption">
+          <label class="editor-field">
+            <span>описание изображения</span>
+            <textarea rows="6" data-gallery-description></textarea>
+          </label>
+          <p class="project-gallery-status is-hidden" data-gallery-status aria-live="polite"></p>
+          <div class="project-gallery-actions">
+            <button class="project-gallery-save" type="button" data-save-project-image>сохранить описание</button>
+            <button class="project-gallery-remove" type="button" data-delete-project-image>удалить изображение</button>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <template data-project-new-image-template>
+      <article class="project-gallery-item-form editor-preview" data-new-project-image>
+        <div class="editor-media" data-file-dropzone>
+          <img data-gallery-image-preview alt="Новое изображение проекта">
+          <label class="editor-upload-zone">
+            <input class="editor-file-input" name="new_gallery_image" type="file" accept="image/png,image/jpeg,image/webp">
+            <span class="editor-upload-empty">
+              <span class="editor-upload-icon" aria-hidden="true">↑</span>
+              <span class="editor-upload-text">Выберите файл или<br>перетащите его сюда</span>
+            </span>
+            <span class="editor-upload-replace">изменить файл</span>
+          </label>
+        </div>
+        <div class="editor-caption project-gallery-caption">
+          <label class="editor-field">
+            <span>описание изображения</span>
+            <textarea rows="6" data-gallery-description></textarea>
+          </label>
+          <p class="project-gallery-status is-hidden" data-gallery-status aria-live="polite"></p>
+          <div class="project-gallery-actions">
+            <button class="project-gallery-save" type="button" data-create-project-image>сохранить изображение</button>
+            <button class="project-gallery-remove" type="button" data-remove-new-project-image>убрать</button>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <script src="/frontend/js/config.js"></script>
+    <script src="/frontend/js/admin-edit-project.js"></script>
+  </body>
+</html>
