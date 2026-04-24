@@ -2,10 +2,10 @@ from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
 from fastapi.responses import JSONResponse
 
 from ...auth import has_admin_access
-from ...db.repositories import get_random_works_list_db, get_work_db, get_works_list_db
-from ...exceptions import WorkCreateError, WorkLoadError, WorkNotFoundError
-from ...schemas.content import WorkCreateSchema
-from ...services.content import create_work_handler, get_work_create_data
+from ...db.work_repositories import get_admin_work_db, get_random_works_list_db, get_work_db, get_works_list_db
+from ...exceptions import WorkCreateError, WorkLoadError, WorkNotFoundError, WorkUpdateError
+from ...schemas.content import WorkCreateSchema, WorkUpdateSchema
+from ...services.content import create_work_handler, get_work_create_data, get_work_update_data, update_work_handler
 from ..router_constants import WORKS_ASSETS_DIR
 
 router = APIRouter()
@@ -52,3 +52,36 @@ async def create_work(
         raise HTTPException(status_code=500, detail="create_error")
 
     return JSONResponse({"id": created_work_id}, status_code=201)
+
+
+@router.get("/api/admin/works/{work_id}", tags=["Admin"], summary="Получение данных работы для редактирования")
+async def get_admin_work(request: Request, work_id: int):
+    if not has_admin_access(request):
+        raise HTTPException(status_code=401, detail="unauthorized")
+
+    try:
+        return await get_admin_work_db(work_id)
+    except WorkNotFoundError:
+        raise HTTPException(status_code=404, detail="not_found")
+    except WorkLoadError:
+        raise HTTPException(status_code=500, detail="load_error")
+
+
+@router.patch("/api/admin/works/{work_id}", tags=["Admin"], summary="Обновление работы")
+async def update_work(
+    request: Request,
+    work_id: int,
+    data: WorkUpdateSchema = Depends(get_work_update_data),
+    image: UploadFile | None = File(None),
+):
+    if not has_admin_access(request):
+        raise HTTPException(status_code=401, detail="unauthorized")
+
+    try:
+        await update_work_handler(work_id, data, image, WORKS_ASSETS_DIR)
+    except WorkNotFoundError:
+        raise HTTPException(status_code=404, detail="not_found")
+    except WorkUpdateError:
+        raise HTTPException(status_code=500, detail="update_error")
+
+    return JSONResponse({"status": "ok"})
